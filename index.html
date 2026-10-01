@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>奇思科创社 Cheers · 真心话大冒险</title>
+<style>
+:root {
+  --bg: #05070f;
+  --panel-2: #131c33;
+  --line: #1f2c4d;
+  --text: #e8f4ff;
+  --muted: #7a8bb3;
+  --cyan: #00e5ff;
+  --pink: #ff2e93;
+  --yellow: #ffd166;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; height:100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow:hidden;
+  user-select:none;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none; z-index:0;
+}
+body::after {
+  content:''; position:fixed; inset:0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0,229,255,0.08), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255,46,147,0.08), transparent 50%);
+  pointer-events:none; z-index:0;
+}
+#app {
+  position:relative; z-index:1;
+  display:flex; flex-direction:column;
+  height:100vh; padding:20px 32px 32px; gap:20px;
+}
+/* 播放器 */
+.player {
+  display:flex; align-items:center; gap:14px;
+  background:rgba(13,20,36,0.7);
+  border:1px solid var(--line);
+  border-radius:16px; padding:12px 20px;
+  backdrop-filter:blur(10px); flex-shrink:0;
+}
+.player .brand {
+  font-weight:800; letter-spacing:2px; color:var(--cyan);
+  font-size:14px; padding-right:16px; border-right:1px solid var(--line);
+  white-space:nowrap;
+}
+.player .btn {
+  background:var(--panel-2); color:var(--text);
+  border:1px solid var(--line); border-radius:10px;
+  padding:10px 18px; font-size:15px; font-weight:600;
+  cursor:pointer; transition:all .15s; white-space:nowrap;
+}
+.player .btn:hover { border-color:var(--cyan); color:var(--cyan); }
+.player .btn.primary {
+  background:linear-gradient(135deg, var(--cyan), #0099cc);
+  color:#001018; border:none;
+}
+.player .btn.primary:hover { filter:brightness(1.15); color:#001018; }
+.player .btn:disabled { opacity:.35; cursor:not-allowed; }
+.player .now {
+  flex:1; min-width:0; font-size:14px; color:var(--muted);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.player .now strong { color:var(--text); font-weight:600; }
+.player .volume {
+  display:flex; align-items:center; gap:8px;
+  color:var(--muted); font-size:13px;
+}
+.player .volume input[type=range] { width:110px; accent-color:var(--cyan); }
+.player .list-toggle {
+  background:transparent; border:1px solid var(--line);
+  border-radius:8px; color:var(--muted);
+  padding:8px 12px; font-size:13px; cursor:pointer;
+}
+.player .list-toggle:hover { color:var(--cyan); border-color:var(--cyan); }
+.player .danger {
+  background:transparent; border:1px solid rgba(255,46,147,0.4);
+  color:var(--pink); border-radius:8px;
+  padding:8px 12px; font-size:13px; cursor:pointer;
+}
+.player .danger:hover { background:rgba(255,46,147,0.1); }
+/* 主舞台 */
+.stage {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  position:relative; min-height:0;
+}
+.choices {
+  display:flex; gap:40px;
+  width:100%; max-width:1100px; height:100%; max-height:480px;
+}
+.choice {
+  flex:1;
+  background:linear-gradient(160deg, rgba(13,20,36,0.9), rgba(19,28,51,0.9));
+  border:2px solid var(--line); border-radius:24px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:18px; cursor:pointer; transition:all .2s;
+  position:relative; overflow:hidden;
+}
+.choice::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 0%, currentColor, transparent 70%);
+  opacity:.06; transition:opacity .2s;
+}
+.choice:hover { transform:translateY(-4px); }
+.choice:hover::before { opacity:.18; }
+.choice.truth { color:var(--cyan); }
+.choice.dare { color:var(--pink); }
+.choice.truth:hover { border-color:var(--cyan); box-shadow:0 0 60px rgba(0,229,255,0.25); }
+.choice.dare:hover { border-color:var(--pink); box-shadow:0 0 60px rgba(255,46,147,0.25); }
+.choice .symbol { font-size:72px; line-height:1; font-weight:200; }
+.choice .title {
+  font-size:48px; font-weight:900; letter-spacing:8px; color:var(--text);
+}
+.choice .en {
+  font-size:16px; letter-spacing:6px; color:currentColor; font-weight:600;
+}
+.choice .desc { font-size:15px; color:var(--muted); letter-spacing:2px; }
+.choice.disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+.choice .badge {
+  position:absolute; top:16px; right:16px;
+  background:rgba(255,46,147,0.15); color:var(--pink);
+  border:1px solid rgba(255,46,147,0.4);
+  border-radius:20px; padding:4px 12px;
+  font-size:12px; letter-spacing:1px;
+}
+/* 题目视图 */
+.question-view {
+  display:none; flex-direction:column;
+  align-items:center; justify-content:center;
+  width:100%; max-width:1200px; gap:32px;
+  padding:40px; text-align:center;
+  animation:fadeIn .3s ease;
+}
+.question-view.active { display:flex; }
+.question-view .type-tag {
+  font-size:18px; letter-spacing:8px; font-weight:700;
+  padding:8px 24px; border-radius:30px; border:1px solid currentColor;
+}
+.question-view.truth .type-tag { color:var(--cyan); }
+.question-view.dare .type-tag { color:var(--pink); }
+.question-view .question-text {
+  font-size:clamp(36px, 5vw, 72px);
+  font-weight:800; line-height:1.35; letter-spacing:1px;
+  max-width:1000px;
+}
+.question-view.truth .question-text { color:#e8fbff; }
+.question-view.dare .question-text { color:#ffe8f4; }
+.question-view .actions { display:flex; gap:20px; margin-top:20px; }
+.question-view .actions button {
+  background:var(--panel-2); color:var(--text);
+  border:1px solid var(--line); border-radius:12px;
+  padding:14px 32px; font-size:18px; font-weight:700;
+  letter-spacing:2px; cursor:pointer; transition:all .15s;
+}
+.question-view .actions button:hover { border-color:var(--cyan); color:var(--cyan); }
+.question-view .actions button.primary {
+  background:linear-gradient(135deg, var(--cyan), #0099cc);
+  color:#001018; border:none;
+}
+.question-view .actions button.primary:hover { filter:brightness(1.15); color:#001018; }
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:none; }
+}
+/* 随机牌弹窗 */
+.chaos-modal {
+  position:fixed; inset:0;
+  background:rgba(5,7,15,0.85);
+  backdrop-filter:blur(8px);
+  display:none; align-items:center; justify-content:center;
+  z-index:100; animation:fadeIn .2s ease;
+}
+.chaos-modal.active { display:flex; }
+.chaos-card {
+  width:min(760px, 88vw);
+  background:linear-gradient(160deg, #1a0f2e, #0d1424);
+  border:2px solid var(--pink); border-radius:28px;
+  padding:48px 56px; text-align:center; position:relative;
+  box-shadow:0 0 80px rgba(255,46,147,0.4), 0 0 200px rgba(255,46,147,0.15);
+  animation:chaosPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes chaosPop {
+  from { opacity:0; transform:scale(.7) rotate(-3deg); }
+  to { opacity:1; transform:scale(1) rotate(0); }
+}
+.chaos-card .chaos-title {
+  font-size:22px; letter-spacing:8px; font-weight:700;
+  color:var(--pink); margin-bottom:8px;
+}
+.chaos-card .chaos-title .but { color:var(--muted); font-style:italic; }
+.chaos-card .chaos-title .chaos-word {
+  font-size:32px; letter-spacing:12px; font-weight:900;
+  background:linear-gradient(135deg, var(--pink), var(--yellow));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.chaos-card .chaos-divider {
+  width:60px; height:3px; background:var(--pink);
+  margin:20px auto; border-radius:2px;
+}
+.chaos-card .chaos-name {
+  font-size:42px; font-weight:900; color:var(--text);
+  margin-bottom:20px; letter-spacing:4px;
+}
+.chaos-card .chaos-desc {
+  font-size:22px; color:#c8d6f0; line-height:1.6; margin-bottom:36px;
+}
+.chaos-card .chaos-close {
+  background:linear-gradient(135deg, var(--pink), #cc1f6f);
+  color:#fff; border:none; border-radius:12px;
+  padding:14px 44px; font-size:18px; font-weight:700;
+  letter-spacing:4px; cursor:pointer; transition:all .15s;
+}
+.chaos-card .chaos-close:hover { filter:brightness(1.15); transform:translateY(-2px); }
+/* 播放列表抽屉 */
+.drawer {
+  position:fixed; top:0; right:0; width:360px; height:100vh;
+  background:rgba(10,14,26,0.97);
+  border-left:1px solid var(--line);
+  backdrop-filter:blur(16px);
+  transform:translateX(100%);
+  transition:transform .25s ease;
+  z-index:90; display:flex; flex-direction:column; padding:24px;
+}
+.drawer.open { transform:none; }
+.drawer h3 {
+  font-size:16px; letter-spacing:4px; color:var(--cyan);
+  margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--line);
+}
+.drawer .list {
+  flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px;
+}
+.drawer .list .item {
+  padding:10px 14px; border-radius:8px; font-size:14px;
+  color:var(--muted); cursor:pointer; transition:all .12s;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.drawer .list .item:hover { background:var(--panel-2); color:var(--text); }
+.drawer .list .item.active {
+  background:rgba(0,229,255,0.1); color:var(--cyan);
+  border-left:3px solid var(--cyan);
+}
+.drawer .empty { color:var(--muted); font-size:13px; text-align:center; padding:40px 0; }
+.drawer .close-drawer {
+  position:absolute; top:20px; right:20px;
+  background:transparent; border:none; color:var(--muted);
+  font-size:22px; cursor:pointer;
+}
+.drawer .close-drawer:hover { color:var(--text); }
+/* Toast */
+.toast {
+  position:fixed; bottom:32px; left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(13,20,36,0.95);
+  border:1px solid var(--line); border-radius:12px;
+  padding:14px 28px; font-size:15px; color:var(--text);
+  opacity:0; pointer-events:none; transition:all .25s; z-index:200;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#fileInput { display:none; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="player">
+    <div class="brand">CHEERS · 传花</div>
+    <input type="file" id="fileInput" accept="audio/mpeg,audio/mp3,audio/*">
+    <button class="btn" id="addBtn">+ 添加音乐</button>
+    <button class="btn primary" id="playBtn" disabled>▶ 播放</button>
+    <div class="now" id="nowPlaying">未选择曲目</div>
+    <div class="volume">
+      <span>🔊</span>
+      <input type="range" id="volume" min="0" max="100" value="80">
+    </div>
+    <button class="list-toggle" id="listToggle">列表</button>
+    <button class="danger" id="resetAll">重置题库</button>
+  </div>
+
+  <div class="stage">
+    <div class="choices" id="choices">
+      <div class="choice truth" data-type="truth">
+        <div class="symbol">◯</div>
+        <div class="title">真心话</div>
+        <div class="en">TRUTH</div>
+        <div class="desc">探索你的秘密</div>
+        <div class="badge" id="truthCount">50</div>
+      </div>
+      <div class="choice dare" data-type="dare">
+        <div class="symbol">△</div>
+        <div class="title">大冒险</div>
+        <div class="en">DARE</div>
+        <div class="desc">接受你的挑战</div>
+        <div class="badge" id="dareCount">50</div>
+      </div>
+    </div>
+
+    <div class="question-view" id="questionView">
+      <div class="type-tag" id="typeTag">真心话</div>
+      <div class="question-text" id="questionText"></div>
+      <div class="actions">
+        <button id="nextBtn" class="primary">下一轮 (Enter)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="drawer" id="drawer">
+  <button class="close-drawer" id="closeDrawer">×</button>
+  <h3>播放列表</h3>
+  <div class="list" id="playlist">
+    <div class="empty">还没有音乐，点击「+ 添加音乐」</div>
+  </div>
+</div>
+
+<div class="chaos-modal" id="chaosModal">
+  <div class="chaos-card">
+    <div class="chaos-title">
+      <span class="but">But —</span> <span class="chaos-word">CHAOS</span>
+    </div>
+    <div class="chaos-divider"></div>
+    <div class="chaos-name" id="chaosName"></div>
+    <div class="chaos-desc" id="chaosDesc"></div>
+    <button class="chaos-close" id="chaosClose">知道了</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 题库 ============ */
+const TRUTH_QUESTIONS = [
+  "最近一次让你笑到停不下来是什么事情？",
+  "如果不用考虑钱，你最想学会什么技能？",
+  "你手机里最舍不得删的一张照片是什么？",
+  "最近循环播放的一首歌是什么？",
+  "如果可以拥有一种超能力，你会选什么？",
+  "你做过最\u201c社死\u201d的事情是什么？",
+  "你最想回到人生中的哪个时期？",
+  "如果明天不用上课，你最想干什么？",
+  "你觉得自己身上最奇怪的一个习惯是什么？",
+  "如果把自己比作一种动物，你觉得是什么？",
+  "在现场找一个人，说说你对他的第一印象。",
+  "现场哪一个人最符合你想象中的\u201c社团大佬\u201d？为什么？",
+  "如果要和现场一个人组队参加比赛，你会选谁？",
+  "你加入奇思科创社最期待的事情是什么？",
+  "如果让你给奇思科创社增加一个新部门，你会开什么？",
+  "你觉得自己最适合负责社团里的什么工作？",
+  "如果社团要拍一部电影，你觉得自己适合演什么角色？",
+  "你认为自己在团队里更像\u201c策划\u201d\u201c执行\u201d还是\u201c摸鱼观察员\u201d？",
+  "如果你能给奇思科创社发明一个\u201c黑科技\u201d，你会发明什么？",
+  "你认为奇思科创社最需要一个什么样的超能力？",
+  "如果让你给社团设计一个新 Logo，你会加入什么元素？",
+  "如果 Cheers 是一个游戏，你觉得它是什么类型？",
+  "你最希望下一次社团活动是什么？",
+  "如果让你成为社团社长一天，你第一件事会做什么？",
+  "你觉得自己能给奇思科创社带来什么？",
+  "如果给未来一年的自己留一句话，你会说什么？",
+  "你最近一次熬夜是为了什么？",
+  "你手机里最常用的三个 App 是什么？",
+  "如果只能吃一种食物吃一辈子，你选什么？",
+  "你小时候最想成为什么职业？",
+  "你做过最勇敢的一件事是什么？",
+  "你最讨厌别人对你说的一句话是什么？",
+  "你最近一次哭是因为什么？",
+  "如果可以隐身一天，你会去做什么？",
+  "你朋友圈里最爱发什么内容？",
+  "你最喜欢自己身上的哪个特点？",
+  "你最想对一年前的自己说什么？",
+  "你有没有一个从没告诉过别人的小癖好？",
+  "你最想和现场哪位同学交换人生一天？",
+  "你觉得\u201c奇思科创社\u201d最像哪种饮料？",
+  "如果社团要选一个吉祥物，你觉得应该是什么？",
+  "你在社团里最想学会的一项技能是什么？",
+  "你最近一次觉得\u201c我真厉害\u201d是什么时候？",
+  "你最想在大学里完成的一件事是什么？",
+  "如果给你一个机会重新选专业，你会选什么？",
+  "你手机里最尴尬的搜索记录类型是什么？",
+  "你最想和现场一个人互换什么身份？",
+  "你觉得社团里最需要改进的一件事是什么？",
+  "你最近一次被人夸是什么时候，夸了什么？",
+  "如果给社团写一句宣传语，你会写什么？"
+];
+
+const DARE_QUESTIONS = [
+  "用播音腔说：\u201c欢迎来到奇思科创社！\u201d",
+  "模仿一种动物叫声，让大家猜是什么。",
+  "用三种不同语气说：\u201c我真的很聪明。\u201d",
+  "对空气进行一次严肃的产品发布会。",
+  "用机器人语气介绍自己。",
+  "原地摆一个你认为最帅的姿势，保持 5 秒。",
+  "用一句话向现场所有人推销一支普通的笔。",
+  "模仿老师上课时最经典的一句话。",
+  "用非常正式的语气说一句非常普通的话，例如：\u201c我要喝水。\u201d",
+  "即兴给自己设计一个超级英雄名字和口号。",
+  "找一位现场同学击掌并说：\u201c合作愉快。\u201d",
+  "找一个人和你一起摆一个\u201c团队合照姿势\u201d。",
+  "随机邀请一位同学，互相说一个优点。",
+  "找一位同学进行 10 秒\u201c无声对视挑战\u201d。",
+  "找一个人完成一次同步动作挑战。",
+  "随机选择一位同学，两人一起喊出社团口号。",
+  "找一个人，用三句话夸对方，但不能重复使用\u201c帅 / 漂亮 / 厉害\u201d。",
+  "把现场任意一个物品当成\u201c黑科技产品\u201d，进行 15 秒产品发布。",
+  "用机器人语气回答主持人的三个问题。",
+  "给奇思科创社即兴拍一条 10 秒广告。",
+  "面对全场说一句：\u201c我希望 Cheers 未来……\u201d",
+  "主持人给你两个毫无关系的词，你必须在 10 秒内创造一个新产品。",
+  "现场即兴创造一句 Cheers 新口号。",
+  "假装自己来自 2035 年，向大家播报一条\u201c奇思科创社新闻\u201d。",
+  "用 30 秒向大家介绍一个完全不存在的科技产品。",
+  "用方言说一句\u201c我是奇思科创社的人\u201d。",
+  "模仿一位现场同学的口头禅，让大家猜是谁。",
+  "用最夸张的语气念一段社团招新广告。",
+  "现场表演一个\u201c机器人没电了\u201d的过程。",
+  "用三个 emoji 概括你今天的心情，并解释。",
+  "假装自己是主播，直播介绍你的室友。",
+  "用最严肃的表情说一句最幼稚的话。",
+  "现场找一个同学，对视并同时说\u201c你最美 / 你最帅\u201d。",
+  "用身体摆出一个字母，让大家猜。",
+  "模仿一种交通工具的声音，持续 5 秒。",
+  "现场给自己取一个武侠称号并解释。",
+  "用三个词形容主持人，不能重复。",
+  "学一位老师上课的语气，念一句课文。",
+  "用说唱的方式介绍自己。",
+  "现场给一位同学颁发\u201c最佳 XX 奖\u201d，并说颁奖词。",
+  "用最慢的语速说一句\u201c奇思科创社最棒\u201d。",
+  "假装自己是 AI 助手，回答主持人一个问题。",
+  "现场找一个同学，合作摆一个\u201c科技感\u201d造型。",
+  "用新闻联播的语气播报今天的社团大会。",
+  "模仿一位社员的走路姿势，让大家猜。",
+  "现场编一句带\u201c奇思\u201d两个字的口号。",
+  "用最深情的方式对一支笔表白。",
+  "假装自己在火星，向大家报平安。",
+  "用三个动作让大家猜一个成语。",
+  "现场找一个同学，两人一起比一个心并说\u201cCheers\u201d。"
+];
+
+const CHAOS_CARDS = [
+  { name: "交换",   desc: "把你抽到的题目，交给现场另一位同学完成。" },
+  { name: "双人挑战", desc: "随机找一位同学，共同完成这个挑战。" },
+  { name: "反转",   desc: "把刚才抽到的「真心话」变成「大冒险」，或者反过来。" },
+  { name: "加码",   desc: "完成当前挑战后，再抽一次。" },
+  { name: "免战",   desc: "本轮安全通过，不用做。" },
+  { name: "随机选择", desc: "由现场观众指定下一位挑战者。" }
+];
+
+/* ============ 状态 ============ */
+let truthPool = [...TRUTH_QUESTIONS];
+let darePool  = [...DARE_QUESTIONS];
+let forceChaos = false;
+let audio = new Audio();
+let playlist = [];
+let currentTrackIndex = -1;
+let isPlaying = false;
+
+/* ============ DOM ============ */
+const $ = id => document.getElementById(id);
+const choicesEl = $('choices');
+const questionView = $('questionView');
+const typeTag = $('typeTag');
+const questionText = $('questionText');
+const truthCount = $('truthCount');
+const dareCount = $('dareCount');
+const playBtn = $('playBtn');
+const addBtn = $('addBtn');
+const fileInput = $('fileInput');
+const nowPlaying = $('nowPlaying');
+const volumeEl = $('volume');
+const drawer = $('drawer');
+const playlistEl = $('playlist');
+const chaosModal = $('chaosModal');
+const chaosName = $('chaosName');
+const chaosDesc = $('chaosDesc');
+const chaosClose = $('chaosClose');
+const toast = $('toast');
+
+/* ============ 工具 ============ */
+function showToast(msg, ms = 1800) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), ms);
+}
+
+function updateCounts() {
+  truthCount.textContent = truthPool.length;
+  dareCount.textContent = darePool.length;
+  choicesEl.querySelector('.choice.truth').classList.toggle('disabled', truthPool.length === 0);
+  choicesEl.querySelector('.choice.dare').classList.toggle('disabled', darePool.length === 0);
+}
+
+function drawFrom(pool) {
+  if (pool.length === 0) return null;
+  const i = Math.floor(Math.random() * pool.length);
+  return pool.splice(i, 1)[0];
+}
+
+/* ============ 音乐播放器 ============ */
+addBtn.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  playlist.push({ name: file.name, url });
+  renderPlaylist();
+  if (currentTrackIndex === -1) {
+    currentTrackIndex = 0;
+    loadTrack(0);
+  }
+  showToast('已添加：' + file.name);
+  fileInput.value = '';
+});
+
+function renderPlaylist() {
+  if (playlist.length === 0) {
+    playlistEl.innerHTML = '<div class="empty">还没有音乐，点击「+ 添加音乐」</div>';
+    return;
+  }
+  playlistEl.innerHTML = '';
+  playlist.forEach((track, i) => {
+    const item = document.createElement('div');
+    item.className = 'item' + (i === currentTrackIndex ? ' active' : '');
+    item.textContent = (i + 1) + '. ' + track.name;
+    item.addEventListener('click', () => {
+      currentTrackIndex = i;
+      loadTrack(i);
+      playAudio();
+    });
+    playlistEl.appendChild(item);
+  });
+}
+
+function loadTrack(i) {
+  if (i < 0 || i >= playlist.length) return;
+  audio.src = playlist[i].url;
+  audio.load();
+  nowPlaying.innerHTML = '当前：<strong>' + playlist[i].name + '</strong>';
+  playBtn.disabled = false;
+  playBtn.textContent = '▶ 播放';
+  isPlaying = false;
+}
+
+function playAudio() {
+  if (!audio.src) { showToast('请先添加音乐'); return; }
+  forceChaos = false;
+  audio.play().then(() => {
+    isPlaying = true;
+    playBtn.textContent = '⏸ 暂停';
+  }).catch(err => showToast('播放失败：' + err.message));
+}
+
+function pauseAudio(withChaos) {
+  audio.pause();
+  isPlaying = false;
+  playBtn.textContent = '▶ 播放';
+  if (withChaos) {
+    forceChaos = true;
+    showToast('本轮将触发随机牌');
+  }
+}
+
+playBtn.addEventListener('click', () => {
+  if (!audio.src) { showToast('请先添加音乐'); return; }
+  if (isPlaying) pauseAudio(true);
+  else playAudio();
+});
+
+volumeEl.addEventListener('input', () => { audio.volume = volumeEl.value / 100; });
+audio.volume = volumeEl.value / 100;
+
+audio.addEventListener('ended', () => {
+  if (playlist.length > 1) {
+    currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+    loadTrack(currentTrackIndex);
+    playAudio();
+  } else {
+    isPlaying = false;
+    playBtn.textContent = '▶ 播放';
+  }
+});
+
+/* ============ 播放列表抽屉 ============ */
+$('listToggle').addEventListener('click', () => drawer.classList.add('open'));
+$('closeDrawer').addEventListener('click', () => drawer.classList.remove('open'));
+
+/* ============ 抽题 ============ */
+choicesEl.addEventListener('click', e => {
+  const card = e.target.closest('.choice');
+  if (!card || card.classList.contains('disabled')) return;
+  const type = card.dataset.type;
+  const pool = type === 'truth' ? truthPool : darePool;
+  const q = drawFrom(pool);
+  if (q === null) { showToast('题库已耗尽'); return; }
+  showQuestion(type, q);
+  updateCounts();
+
+  const shouldChaos = forceChaos || Math.random() < 0.2;
+  forceChaos = false;
+  if (shouldChaos) setTimeout(showChaos, 400);
+});
+
+function showQuestion(type, text) {
+  choicesEl.style.display = 'none';
+  questionView.classList.add('active');
+  questionView.classList.remove('truth', 'dare');
+  questionView.classList.add(type);
+  typeTag.textContent = type === 'truth' ? '真心话' : '大冒险';
+  questionText.textContent = '\u201c' + text + '\u201d';
+}
+
+function backToChoices() {
+  questionView.classList.remove('active');
+  choicesEl.style.display = 'flex';
+  if (truthPool.length === 0 && darePool.length === 0) {
+    showToast('题库全部耗尽，点右上「重置题库」', 3000);
+  }
+}
+
+$('nextBtn').addEventListener('click', backToChoices);
+
+$('resetAll').addEventListener('click', () => {
+  truthPool = [...TRUTH_QUESTIONS];
+  darePool  = [...DARE_QUESTIONS];
+  updateCounts();
+  backToChoices();
+  showToast('题库已重置');
+});
+
+/* ============ 随机牌 ============ */
+function showChaos() {
+  const card = CHAOS_CARDS[Math.floor(Math.random() * CHAOS_CARDS.length)];
+  chaosName.textContent = card.name;
+  chaosDesc.textContent = card.desc;
+  chaosModal.classList.add('active');
+}
+function closeChaos() { chaosModal.classList.remove('active'); }
+chaosClose.addEventListener('click', closeChaos);
+
+/* ============ 快捷键 ============ */
+document.addEventListener('keydown', e => {
+  if (chaosModal.classList.contains('active')) {
+    if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape') {
+      e.preventDefault(); closeChaos();
+    }
+    return;
+  }
+  if (questionView.classList.contains('active')) {
+    if (e.code === 'Enter') { e.preventDefault(); backToChoices(); }
+    return;
+  }
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!audio.src) { showToast('请先添加音乐'); return; }
+    if (isPlaying) pauseAudio(false);
+    else playAudio();
+  } else if (e.code === 'Digit1') {
+    const card = choicesEl.querySelector('.choice.truth');
+    if (!card.classList.contains('disabled')) card.click();
+  } else if (e.code === 'Digit2') {
+    const card = choicesEl.querySelector('.choice.dare');
+    if (!card.classList.contains('disabled')) card.click();
+  }
+});
+
+/* ============ 初始化 ============ */
+updateCounts();
+renderPlaylist();
+</script>
+</body>
+</html>
