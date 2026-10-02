@@ -27,8 +27,9 @@
   --dare-dark:#C26832;
   --gold:#E8B24E;
   --gold-dark:#B8853A;
-  --chaos:#E8834A;
-  --chaos-dark:#C26832;
+  /* CHAOS：莫奈夕阳橙黄 */
+  --chaos:#E8A44E;
+  --chaos-dark:#C4862F;
   --vscode-blue:#007ACC;
   --vscode-blue-dark:#005A9E;
   --radius:10px;
@@ -162,7 +163,6 @@ body::before{
 #folderOverlay.show{opacity:1;pointer-events:auto;}
 #folderOverlay.hidden{opacity:0;pointer-events:none;}
 
-/* 信封色板：暖色偏深 */
 :root{
   --back-fill:#241C15;
   --back-inset-shadow:inset 0 0 6px 2px rgba(232,178,78,.26),0 20px 44px -16px rgba(36,28,21,.75);
@@ -215,7 +215,6 @@ body::before{
 }
 .folder:hover .flap{transform:translate(-50%,-50%) rotateX(-45deg);}
 
-/* 毛玻璃层：与 SVG 同形状裁剪，不再露方形尖角 */
 .flap-blur{
   position:absolute;inset:0;
   backdrop-filter:blur(6px);
@@ -259,24 +258,15 @@ body::before{
 }
 .intro-letter.show{transform:translate(-50%,-50%) scale(1) translateY(0);opacity:1;pointer-events:auto;}
 .intro-letter.exit{transform:translate(-50%, 60vh) scale(.85);opacity:0;pointer-events:none;}
-.intro-letter::before{
-  content:'';position:absolute;left:0;right:0;top:0;height:6px;
-  background:repeating-linear-gradient(to right,
-    #E8B24E 0,#E8B24E 20px, #4A8DB8 20px,#4A8DB8 40px,
-    #E8834A 40px,#E8834A 60px, #7BB89A 60px,#7BB89A 80px);
-}
-.letter-head{padding:34px 40px 18px 26px;display:flex;align-items:center;gap:16px;border-bottom:1px dashed #D9CBAD;}
-/* ★ rule.gif 放大 + 稍微左移（负 margin 往左推） */
+
+.letter-head{padding:34px 40px 18px 56px;display:flex;align-items:center;gap:18px;border-bottom:1px dashed #D9CBAD;}
 .letter-head-gif{
-  width:80px;height:80px;flex-shrink:0;
+  width:84px;height:84px;flex-shrink:0;
   object-fit:contain;display:block;
-  margin-left:-14px;
-  margin-right:-4px;
 }
 .letter-head-text{display:flex;flex-direction:column;}
 .letter-title{font-family:var(--font-hand);font-size:2.05rem;font-weight:600;color:var(--ink);letter-spacing:.06em;line-height:1.2;}
 .letter-sub{font-family:var(--font-serif);font-style:italic;font-size:13px;color:var(--ink-faint);letter-spacing:.24em;text-transform:uppercase;margin-top:2px;}
-/* 去掉右侧滚动条（规则内容已可完整展示） */
 .letter-body{padding:22px 40px 30px;flex:1;}
 .letter-intro{font-family:var(--font-round);font-size:15px;line-height:1.85;color:var(--ink-soft);margin-bottom:20px;text-align:center;padding:0 12px;}
 .rule-list{display:flex;flex-direction:column;gap:12px;}
@@ -313,7 +303,6 @@ body::before{
   gap:26px;margin-bottom:32px;padding:8px 0 4px;
   flex-shrink:0;
 }
-/* ★ logo 稍微放大 */
 .header-logo{
   width:108px;height:108px;border-radius:50%;object-fit:cover;flex-shrink:0;
   filter:drop-shadow(0 8px 22px rgba(0,90,158,.35));
@@ -330,7 +319,6 @@ body::before{
 body.stage-main .header-logo{opacity:1;transform:translateX(0);animation:logoFloat 3.4s ease-in-out .9s infinite;}
 body.stage-main .header-text{opacity:1;transform:translateX(0);}
 .header-line1{display:flex;align-items:baseline;gap:18px;line-height:1}
-/* ★ CHEERS 字体调大 3.2rem → 3.6rem */
 .header-cheers{
   font-family:var(--font-hand);
   font-size:3.6rem;font-weight:600;
@@ -339,7 +327,6 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
   text-shadow:3px 3px 0 rgba(0,90,158,.22);
   line-height:1;
 }
-/* ★ 奇思科创社 字体调大 3rem → 3.4rem */
 .header-club{
   font-family:var(--font-hand);
   font-size:3.4rem;font-weight:500;
@@ -357,7 +344,6 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
   margin-right:-.36em;
 }
 
-/* 卡片区：等比放大，两侧留白仍存在 */
 .cards-panel{
   display:flex;gap:72px;justify-content:center;align-items:stretch;
   flex-wrap:nowrap;margin-bottom:0;
@@ -405,13 +391,11 @@ body.stage-main .pixar-card:hover{
   display:flex;align-items:center;justify-content:center;
   line-height:0;
 }
-/* ★ 真心话（左）头像单独放大到 68px，让两个 GIF 视觉一致 */
 .truth-card .card-avatar{
   width:68px;
   height:68px;
 }
 .pixar-card:hover .card-avatar{transform:scale(1.06) rotate(6deg);}
-/* ★ 用 cover 让两张 GIF 视觉大小一致 */
 .card-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;}
 .card-username{
   margin-left:0.85em;
@@ -508,7 +492,9 @@ body.stage-main .pixar-card:hover{
 .draw-button:disabled{cursor:not-allowed;filter:grayscale(.5);opacity:.55;transform:none;}
 .draw-button .btn-icon{font-size:1.05em;line-height:1;}
 
-/* CHAOS 弹窗 */
+/* ============================================================
+   CHAOS 弹窗（莫奈夕阳橙黄）
+   ============================================================ */
 .chaos-overlay{
   position:fixed;inset:0;background:rgba(43,42,39,.72);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -559,21 +545,6 @@ body.stage-main .pixar-card:hover{
 .chaos-close .btn-icon{font-family:"Font Awesome 6 Free", "Font Awesome 6 Brands" !important;font-size:14px;letter-spacing:0;}
 .chaos-close:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 #000;filter:brightness(1.05);}
 .chaos-close:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #000;}
-.chaos-cat{position:absolute;right:4px;bottom:0;transform:scale(1.15);transform-origin:bottom right;pointer-events:none;z-index:1;}
-.loader-cat{width:fit-content;height:fit-content;display:flex;align-items:center;justify-content:center;}
-.loader-cat .wrapper{width:fit-content;height:fit-content;display:flex;flex-direction:column;justify-content:center;align-items:center;}
-.loader-cat .catContainer{width:100%;height:fit-content;display:flex;align-items:center;justify-content:center;position:relative;}
-.loader-cat .catbody{width:50px}
-.loader-cat .catbody path{fill:#C26832}
-.loader-cat .tail{position:absolute;width:11px;top:50%;animation:catTail .5s ease-in infinite alternate-reverse;transform-origin:top;}
-.loader-cat .tail path{fill:#A85A2A}
-@keyframes catTail{0%{transform:rotateZ(60deg)}50%{transform:rotateZ(0deg)}100%{transform:rotateZ(-20deg)}}
-.loader-cat .wall{width:180px}
-.loader-cat .wall line{stroke:#D9CBAD}
-.loader-cat .text{display:flex;flex-direction:column;width:40px;position:absolute;margin:0 0 60px 74px;}
-.loader-cat .zzz{color:transparent;font-weight:700;font-size:11px;animation:zzz 2s linear infinite;}
-.loader-cat .bigzzz{color:transparent;font-weight:700;font-size:17px;margin-left:8px;animation:zzz 2.3s linear infinite;}
-@keyframes zzz{0%{color:transparent}50%{color:#C26832}100%{color:transparent}}
 
 /* 卡片内动画池 */
 .loader-boot-anim{position:relative;width:2.5em;height:2.5em;transform:rotate(165deg);font-size:16px;display:inline-block;}
@@ -611,13 +582,52 @@ body.stage-main .pixar-card:hover{
 @keyframes sqWave{0%,65%,100%{opacity:.3;transform:scale(.55)}30%{opacity:1;transform:scale(1)}}
 .truth-card .loader-grid-anim{--sq-color:#5BA3C7}
 .dare-card .loader-grid-anim{--sq-color:#E8834A}
-.spin-loader{width:96px;height:96px;border-radius:50%;position:relative;display:flex;justify-content:center;align-items:center;animation:spin3 3s linear infinite;background:conic-gradient(#4285F4 0deg,#4285F4 300deg,transparent 270deg,transparent 360deg);}
-.spin-loader::before{content:"";position:absolute;width:60%;height:60%;border-radius:50%;animation:spin2 2s linear infinite;background:conic-gradient(#FBBC05 0deg,#FBBC05 270deg,transparent 180deg,transparent 360deg);z-index:8;}
-.spin-loader::after{content:"";position:absolute;width:75%;height:75%;border-radius:50%;animation:spin3 3s linear infinite;background:conic-gradient(#DB4437 0deg,#DB4437 180deg,transparent 180deg,transparent 360deg);z-index:6;}
-.spin-loader > span{position:absolute;width:85%;height:85%;border-radius:50%;animation:spin5 5s linear infinite;background:conic-gradient(#0F9D58 0deg,#0F9D58 180deg,transparent 180deg,transparent 360deg);z-index:6;}
-@keyframes spin2{to{transform:rotate(360deg)}}
-@keyframes spin3{to{transform:rotate(360deg)}}
-@keyframes spin5{to{transform:rotate(360deg)}}
+
+/* ===== pl 陀螺（卡片 loader · conic 槽位） ===== */
+.pl {
+  display: block;
+  width: 90px;
+  height: 90px;
+}
+.pl__arrows,
+.pl__ring-rotate,
+.pl__ring-stroke,
+.pl__tick {
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.pl__arrows {
+  animation-name: arrows42;
+  transform: rotate(45deg);
+  transform-origin: 16px 52px;
+}
+.pl__ring-rotate,
+.pl__ring-stroke { transform-origin: 80px 80px; }
+.pl__ring-rotate { animation-name: ringRotate42; }
+.pl__ring-stroke {
+  animation-name: ringStroke42;
+  transform: rotate(-45deg);
+}
+.pl__tick { animation-name: tick42; }
+.pl__tick:nth-child(2){ animation-delay:-1.75s; }
+.pl__tick:nth-child(3){ animation-delay:-1.5s; }
+.pl__tick:nth-child(4){ animation-delay:-1.25s; }
+.pl__tick:nth-child(5){ animation-delay:-1s; }
+.pl__tick:nth-child(6){ animation-delay:-0.75s; }
+.pl__tick:nth-child(7){ animation-delay:-0.5s; }
+.pl__tick:nth-child(8){ animation-delay:-0.25s; }
+@keyframes arrows42 { from{transform:rotate(45deg)} to{transform:rotate(405deg)} }
+@keyframes ringRotate42 { from{transform:rotate(0)} to{transform:rotate(720deg)} }
+@keyframes ringStroke42 {
+  from,to { stroke-dashoffset:452; transform:rotate(-45deg); }
+  50%    { stroke-dashoffset:169.5; transform:rotate(-180deg); }
+}
+@keyframes tick42 {
+  from,3%,47%,to { stroke-dashoffset:-12; }
+  14%,36% { stroke-dashoffset:0; }
+}
+
 .loader-bars-anim{display:flex;justify-content:center;align-items:center;}
 .loader-bars-anim .bar{width:7px;height:16px;margin:0 2px;border-radius:3px;animation:barWave 2s ease-in-out infinite;}
 .loader-bars-anim .bar:nth-child(1){background:#4A8DB8;animation-delay:-.8s}
@@ -700,7 +710,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
 .music-dot.show{display:block;}
 @keyframes pulseGreen{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.75}}
 
-/* 音量浮动面板 */
 .volume-popover{
   position:absolute;left:0;bottom:96px;width:220px;
   padding:16px 18px 14px;background:#fff;
@@ -741,7 +750,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
 .volume-slider::-webkit-slider-thumb:hover{transform:scale(1.15);border-color:var(--gold-dark);box-shadow:0 4px 10px rgba(184,133,58,.55);}
 .volume-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--gold);cursor:pointer;}
 
-/* 黑胶播放器 */
 .vinyl-player{
   position:fixed;right:24px;bottom:24px;z-index:95;
   display:flex;flex-direction:column;align-items:center;
@@ -852,7 +860,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
 @keyframes eqBounce{0%,100%{transform:scaleY(0.4);opacity:.65;}50%{transform:scaleY(1);opacity:1;}}
 .vinyl-player.paused .eq-bar{animation-play-state:paused;transform:scaleY(0.35);opacity:.5;}
 
-/* Toast */
 .toast-tip{
   position:fixed;top:26px;left:50%;
   transform:translateX(-50%) translateY(-16px);
@@ -866,7 +873,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
 }
 .toast-tip.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* 响应式 */
 @media (max-width:768px){
   html,body{overflow:auto}
   .container{
@@ -895,7 +901,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .chaos-name{font-size:1.9rem}
   .chaos-desc{font-size:1rem}
   .chaos-actions{padding-left:0;text-align:center}
-  .chaos-cat{transform:scale(.75);transform-origin:bottom right}
   .tool-fab{left:16px;bottom:16px;width:50px;height:50px;}
   .tool-main{width:50px;height:50px;}
   .tool-main svg{width:22px;height:22px;}
@@ -906,8 +911,8 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .volume-popover{width:190px;padding:14px 16px 12px;}
   .vinyl-player{right:16px;bottom:16px;}
   .intro-letter{width:94vw;}
-  .letter-head{padding:24px 22px 14px 12px;}
-  .letter-head-gif{width:62px;height:62px;margin-left:-8px;}
+  .letter-head{padding:24px 22px 14px 32px;}
+  .letter-head-gif{width:64px;height:64px;}
   .letter-body{padding:18px 22px 22px;}
   .letter-footer{padding:14px 22px 20px;}
   .google-loader-wrap{gap:120px;transform:translateY(20px);}
@@ -918,9 +923,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
 </head>
 <body>
 
-<!-- ============================================================
-     一、Google 加载遮罩
-     ============================================================ -->
+<!-- Google 加载遮罩 -->
 <div id="googleOverlay">
   <div class="google-loader-wrap">
     <div class="loading-pm">
@@ -944,9 +947,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </div>
 </div>
 
-<!-- ============================================================
-     二、文件夹遮罩
-     ============================================================ -->
+<!-- 文件夹遮罩 -->
 <div id="folderOverlay">
   <div class="intro-folder-scale">
     <label class="folder" id="introFolder">
@@ -1033,9 +1034,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </div>
 </div>
 
-<!-- ============================================================
-     三、信纸
-     ============================================================ -->
+<!-- 信纸 -->
 <div class="intro-letter" id="introLetter">
   <div class="letter-head">
     <img src="./rule.gif" alt="Rule" class="letter-head-gif" onerror="this.style.display='none'">
@@ -1077,9 +1076,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </div>
 </div>
 
-<!-- ============================================================
-     四、主内容
-     ============================================================ -->
+<!-- 主内容 -->
 <div class="container">
   <header class="header">
     <img src="logo.png" alt="CHEERS" class="header-logo" onerror="this.style.display='none'">
@@ -1094,7 +1091,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </header>
 
   <div class="cards-panel">
-    <!-- 真心话 -->
     <div class="pixar-card truth-card">
       <div class="card-header">
         <div class="card-avatar"><img src="./blue.gif" alt="真心话"></div>
@@ -1128,7 +1124,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       </div>
     </div>
 
-    <!-- 大冒险 -->
     <div class="pixar-card dare-card">
       <div class="card-header">
         <div class="card-avatar"><img src="./orange.gif" alt="大冒险"></div>
@@ -1164,52 +1159,9 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </div>
 </div>
 
-<!-- ============================================================
-     CHAOS 弹窗
-     ============================================================ -->
+<!-- CHAOS 弹窗（已删除猫） -->
 <div class="chaos-overlay" id="chaosOverlay">
   <div class="chaos-box">
-    <div class="chaos-cat">
-      <div class="loader-cat">
-        <div class="wrapper">
-          <div class="catContainer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 733 673" class="catbody">
-              <path d="M111.002 139.5C270.502 -24.5001 471.503 2.4997 621.002 139.5C770.501 276.5 768.504 627.5 621.002 649.5C473.5 671.5 246 687.5 111.002 649.5C-23.9964 611.5 -48.4982 303.5 111.002 139.5Z"></path>
-              <path d="M184 9L270.603 159H97.3975L184 9Z"></path>
-              <path d="M541 0L627.603 150H454.397L541 0Z"></path>
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 158 564" class="tail">
-              <path d="M5.97602 76.066C-11.1099 41.6747 12.9018 0 51.3036 0V0C71.5336 0 89.8636 12.2558 97.2565 31.0866C173.697 225.792 180.478 345.852 97.0691 536.666C89.7636 553.378 73.0672 564 54.8273 564V564C16.9427 564 -5.4224 521.149 13.0712 488.085C90.2225 350.15 87.9612 241.089 5.97602 76.066Z"></path>
-            </svg>
-            <div class="text">
-              <span class="bigzzz">Z</span>
-              <span class="zzz">Z</span>
-            </div>
-          </div>
-          <div class="wallContainer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 500 126" class="wall">
-              <line stroke-width="4" y2="3" x2="450" y1="3" x1="50"></line>
-              <line stroke-width="4" y2="85" x2="400" y1="85" x1="100"></line>
-              <line stroke-width="4" y2="122" x2="375" y1="122" x1="125"></line>
-              <line stroke-width="4" y2="43" x2="500" y1="43"></line>
-              <line stroke-width="4" y2="1.99" x2="115.5" y1="43.01" x1="115.5"></line>
-              <line stroke-width="4" y2="2" x2="189" y1="43.01" x1="189"></line>
-              <line stroke-width="4" y2="2.01" x2="262.5" y1="43.02" x2="262.5"></line>
-              <line stroke-width="4" y2="2.01" x2="336" y1="43.02" x2="336"></line>
-              <line stroke-width="4" y2="2.02" x2="409.5" y1="43.03" x1="409.5"></line>
-              <line stroke-width="4" y2="43" x2="153" y1="84.01" x1="153"></line>
-              <line stroke-width="4" y2="43" x2="228" y1="84.01" x1="228"></line>
-              <line stroke-width="4" y2="43" x2="303" y1="84.01" x1="303"></line>
-              <line stroke-width="4" y2="43" x2="378" y1="84.01" x1="378"></line>
-              <line stroke-width="4" y2="84" x2="192" y1="125.01" x1="192"></line>
-              <line stroke-width="4" y2="84" x2="267" y1="125.01" x1="267"></line>
-              <line stroke-width="4" y2="84" x2="342" y1="125.01" x1="342"></line>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="chaos-header">
       <svg class="chaos-quote" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M9.6 4C5.4 6.1 3 9.6 3 14.2c0 3.2 2.1 5.8 5.1 5.8 2.6 0 4.5-2 4.5-4.5 0-2.4-1.8-4.3-4.2-4.3-.4 0-.9.1-1 .1.3-2.4 2.4-5.1 4.6-6.3L9.6 4zm10.4 0c-4.2 2.1-6.6 5.6-6.6 10.2 0 3.2 2.1 5.8 5.1 5.8 2.6 0 4.5-2 4.5-4.5 0-2.4-1.8-4.3-4.2-4.3-.4 0-.9.1-1 .1.3-2.4 2.4-5.1 4.6-6.3L20 4z"/>
@@ -1223,7 +1175,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
     <div class="chaos-divider"></div>
 
     <div class="chaos-body">
-      <div class="chaos-name" id="chaosName">交换</div>
+      <div class="chaos-name" id="chaosName">移花接木</div>
       <div class="chaos-desc" id="chaosDesc">把你抽到的题目，交给现场另一位同学完成。</div>
     </div>
 
@@ -1235,9 +1187,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </div>
 </div>
 
-<!-- ============================================================
-     左下角工具浮按钮
-     ============================================================ -->
+<!-- 工具浮按钮 -->
 <div class="tool-fab" id="toolFab">
   <button class="tool-item i1" id="toolRefresh" title="刷新题库">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1277,9 +1227,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   </div>
 </div>
 
-<!-- ============================================================
-     黑胶唱片播放器
-     ============================================================ -->
+<!-- 黑胶播放器 -->
 <div class="vinyl-player" id="vinylPlayer">
   <button class="vinyl-close" id="vinylClose" title="关闭">
     <i class="fas fa-times"></i>
@@ -1403,12 +1351,7 @@ function toggleFullscreen(){
   else exitFullscreen();
 }
 
-/* ==================== 开场流程 ====================
-   stage 0: Google 加载页
-   stage 1: 信封
-   stage 2: 规则纸
-   stage 3: 主界面
-   =================================================== */
+/* ==================== 开场流程 ==================== */
 const googleOverlay = document.getElementById('googleOverlay');
 const folderOverlay = document.getElementById('folderOverlay');
 const introFolder = document.getElementById('introFolder');
@@ -1440,7 +1383,6 @@ introFolder.addEventListener('click', (e) => {
 
 let wheelAccumulator = 0;
 
-/* 进入主界面 */
 function startMainStage(){
   if (stage !== 2) return;
   stage = 3;
@@ -1462,7 +1404,6 @@ function startMainStage(){
   }, 2000);
 }
 
-/* 从主界面返回规则页 */
 function goBackToRules(){
   if (stage !== 3) return;
   stage = 2;
@@ -1482,7 +1423,6 @@ function goBackToRules(){
   }, 150);
 }
 
-/* 滚轮：stage 2 下滑进入；stage 3 上滑返回 */
 document.addEventListener('wheel', (e) => {
   if (stage === 2 && e.deltaY > 0){
     wheelAccumulator += e.deltaY;
@@ -1521,7 +1461,7 @@ document.addEventListener('touchmove', (e) => {
   }
 }, { passive: true });
 
-/* ==================== 题库（调试版 · 每种仅 2 条） ==================== */
+/* ==================== 题库 ==================== */
 const truthList = [
   "你做过最『社死』的事情是什么？后来怎么圆的？",
   "如果社团突然获得一笔巨款，你第一个建议买什么？"
@@ -1544,7 +1484,37 @@ const chaosCards = [
 /* ==================== 卡片内动画池 ==================== */
 const LOADER_HTML = {
   grid: '<span class="loader-grid-anim"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>',
-  conic: '<div class="spin-loader"><span></span></div>',
+  conic: '<svg class="pl" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">' +
+         '<defs><linearGradient id="plGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#000"/><stop offset="100%" stop-color="#fff"/></linearGradient>' +
+         '<mask id="plMask1"><rect x="0" y="0" width="160" height="160" fill="url(#plGrad)"/></mask>' +
+         '<mask id="plMask2"><rect x="28" y="28" width="104" height="104" fill="url(#plGrad)"/></mask></defs>' +
+         '<g><g class="pl__ring-rotate"><circle class="pl__ring-stroke" cx="80" cy="80" r="72" fill="none" stroke="hsl(223,90%,55%)" stroke-width="16" stroke-dasharray="452.39 452.39" stroke-dashoffset="452" stroke-linecap="round" transform="rotate(-45,80,80)"/></g></g>' +
+         '<g mask="url(#plMask1)"><g class="pl__ring-rotate"><circle class="pl__ring-stroke" cx="80" cy="80" r="72" fill="none" stroke="hsl(193,90%,55%)" stroke-width="16" stroke-dasharray="452.39 452.39" stroke-dashoffset="452" stroke-linecap="round" transform="rotate(-45,80,80)"/></g></g>' +
+         '<g><g stroke-width="4" stroke-dasharray="12 12" stroke-dashoffset="12" stroke-linecap="round" transform="translate(80,80)">' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(-135,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(-90,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(-45,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(0,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(45,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(90,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(135,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(180,0,0) translate(0,40)"/></g></g>' +
+         '<g mask="url(#plMask1)"><g stroke-width="4" stroke-dasharray="12 12" stroke-dashoffset="12" stroke-linecap="round" transform="translate(80,80)">' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(-135,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(-90,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(-45,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(0,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(45,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(90,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(135,0,0) translate(0,40)"/>' +
+         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(180,0,0) translate(0,40)"/></g></g>' +
+         '<g><g transform="translate(64,28)"><g class="pl__arrows" transform="rotate(45,16,52)">' +
+         '<path fill="hsl(3,90%,55%)" d="M17.998,1.506l13.892,43.594c.455,1.426-.56,2.899-1.998,2.899H2.108c-1.437,0-2.452-1.473-1.998-2.899L14.002,1.506c.64-2.008,3.356-2.008,3.996,0Z"/>' +
+         '<path fill="hsl(223,10%,90%)" d="M14.009,102.499L.109,58.889c-.453-1.421,.559-2.889,1.991-2.889H29.899c1.433,0,2.444,1.468,1.991,2.889l-13.899,43.61c-.638,2.001-3.345,2.001-3.983,0Z"/></g></g></g>' +
+         '<g mask="url(#plMask2)"><g transform="translate(64,28)"><g class="pl__arrows" transform="rotate(45,16,52)">' +
+         '<path fill="hsl(333,90%,55%)" d="M17.998,1.506l13.892,43.594c.455,1.426-.56,2.899-1.998,2.899H2.108c-1.437,0-2.452-1.473-1.998-2.899L14.002,1.506c.64-2.008,3.356-2.008,3.996,0Z"/>' +
+         '<path fill="hsl(223,90%,80%)" d="M14.009,102.499L.109,58.889c-.453-1.421,.559-2.889,1.991-2.889H29.899c1.433,0,2.444,1.468,1.991,2.889l-13.899,43.61c-.638,2.001-3.345,2.001-3.983,0Z"/></g></g></g>' +
+         '</svg>',
   bars: '<div class="loader-bars-anim">' +
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
@@ -1752,7 +1722,6 @@ toolRefresh.addEventListener('click', () => {
   showToast('题库已重置');
 });
 
-/* 打开音乐播放器 —— 工具浮按钮保留，可随时调音量 */
 toolMusic.addEventListener('click', () => {
   toolFab.classList.remove('open');
   volumePopover.classList.remove('show');
@@ -1801,7 +1770,6 @@ let currentIndex = 0;
 let isPlaying = false;
 let isDraggingProgress = false;
 
-/* 关闭播放器 —— 工具浮按钮一直保留 */
 vinylClose.addEventListener('click', (e) => {
   e.stopPropagation();
   vinylPlayer.classList.remove('show');
