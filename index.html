@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="./subset/result.css">
+<link rel="stylesheet" href="./subset-body/result.css">
 <style>
 /* ==================== 进入遮罩 ==================== */
 #enterOverlay{
@@ -120,8 +121,8 @@
   --green:#7BB89A;
   --chaos:#E8834A;--chaos-dark:#C26832;
   --radius:10px;--radius-sm:6px;
-  --font-sans:'ChillRoundF','т»њУЮЅтЁетюєСйЊ',-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
-  --font-round:'ChillRoundF','т»њУЮЅтЁетюєСйЊ',"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-sans: '寒蝉全圆体','ChillRoundF','т»њУЮЅтЁетюєСйЊ',-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+  --font-round: '寒蝉全圆体','ChillRoundF','т»њУЮЅтЁетюєСйЊ',"PingFang SC","Microsoft YaHei",sans-serif;
   --font-hand:'AliHYAiHei-Beta','PingFang SC','Microsoft YaHei',sans-serif;
   --font-serif:Georgia,"Times New Roman",serif;
 }
@@ -484,7 +485,6 @@ body::before{
   100%{opacity:1;transform:scale(1) rotate(0)}
 }
 
-/* 标题：But + CHAOS 横排 */
 .chaos-header{
   position:relative;
   padding-left:58px;
@@ -584,7 +584,7 @@ body::before{
 .chaos-close:hover{filter:brightness(1.06)}
 .chaos-close:active{transform:translate(4px,4px);box-shadow:0 0 0 0 var(--chaos-dark)}
 
-/* 猫：弹窗右下角 */
+/* 猫 */
 .chaos-cat{
   position:absolute;
   right:4px;
@@ -669,22 +669,6 @@ body::before{
   100%{box-shadow:.5em 1em rgba(143,168,144,.85),-.5em -1em rgba(201,170,112,.85)}
 }
 
-/* 四色圆环变形 */
-.loader-ring{
-  width:70px;height:70px;border-radius:50%;
-  border:7px solid transparent;
-  border-top:7px solid #4A8DB8;
-  border-right:7px solid #E8834A;
-  border-bottom:7px solid #7BB89A;
-  border-left:7px solid #E8B24E;
-  animation:ring-rot 1.6s linear infinite,ring-morph 1.6s ease-in-out infinite;
-}
-@keyframes ring-rot{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-@keyframes ring-morph{
-  0%,100%{border-radius:50%;width:70px;height:70px}
-  50%{border-radius:10%;width:86px;height:86px}
-}
-
 /* 9 方块波浪 */
 .loader-grid-anim{
   --sq-size:10px;--sq-gap:4px;--sq-radius:2.5px;--sq-color:#4A8DB8;
@@ -715,32 +699,32 @@ body::before{
 .truth-folder .loader-grid-anim{--sq-color:#5BA3C7}
 .dare-folder .loader-grid-anim{--sq-color:#E8834A}
 
-/* 三层圆锥渐变 */
+/* 三层圆锥 · Google 配色 */
 .spin-loader{
   width:96px;height:96px;border-radius:50%;
   position:relative;display:flex;
   justify-content:center;align-items:center;
   animation:spin3 3s linear infinite;
-  background:conic-gradient(#4A8DB8 0deg,#4A8DB8 300deg,transparent 270deg,transparent 360deg);
+  background:conic-gradient(#4285F4 0deg,#4285F4 300deg,transparent 270deg,transparent 360deg);
 }
 .spin-loader::before{
   content:"";position:absolute;
   width:60%;height:60%;border-radius:50%;
   animation:spin2 2s linear infinite;
-  background:conic-gradient(#E8B24E 0deg,#E8B24E 270deg,transparent 180deg,transparent 360deg);
+  background:conic-gradient(#FBBC05 0deg,#FBBC05 270deg,transparent 180deg,transparent 360deg);
   z-index:8;
 }
 .spin-loader::after{
   content:"";position:absolute;
   width:75%;height:75%;border-radius:50%;
   animation:spin3 3s linear infinite;
-  background:conic-gradient(#E8834A 0deg,#E8834A 180deg,transparent 180deg,transparent 360deg);
+  background:conic-gradient(#DB4437 0deg,#DB4437 180deg,transparent 180deg,transparent 360deg);
   z-index:6;
 }
 .spin-loader > span{
   position:absolute;width:85%;height:85%;border-radius:50%;
   animation:spin5 5s linear infinite;
-  background:conic-gradient(#7BB89A 0deg,#7BB89A 180deg,transparent 180deg,transparent 360deg);
+  background:conic-gradient(#0F9D58 0deg,#0F9D58 180deg,transparent 180deg,transparent 360deg);
   z-index:6;
 }
 @keyframes spin2{to{transform:rotate(360deg)}}
@@ -771,63 +755,163 @@ body::before{
   40%{transform:scale(1)}
 }
 
-/* 水滴融合 */
-.loader-goo-wrap{
+/* 沙漏 · 陶土色 */
+.loader-hourglass{
+  --dur:2s;
+  display:block;
+  width:80px;height:80px;
+}
+.loader-hourglass .loader__glare-top,
+.loader-hourglass .loader__glare-bottom,
+.loader-hourglass .loader__model,
+.loader-hourglass .loader__motion-thick,
+.loader-hourglass .loader__motion-medium,
+.loader-hourglass .loader__motion-thin,
+.loader-hourglass .loader__sand-drop,
+.loader-hourglass .loader__sand-fill,
+.loader-hourglass .loader__sand-grain-left,
+.loader-hourglass .loader__sand-grain-right,
+.loader-hourglass .loader__sand-line-left,
+.loader-hourglass .loader__sand-line-right,
+.loader-hourglass .loader__sand-mound-top,
+.loader-hourglass .loader__sand-mound-bottom{
+  animation-duration:var(--dur);
+  animation-timing-function:cubic-bezier(.83,0,.17,1);
+  animation-iteration-count:infinite;
+}
+.loader-hourglass .loader__glare-top{animation-name:hg-glare-top}
+.loader-hourglass .loader__glare-bottom{animation-name:hg-glare-bottom}
+.loader-hourglass .loader__model{animation-name:hg-flip;transform-origin:12.25px 16.75px}
+.loader-hourglass .loader__motion-thick,
+.loader-hourglass .loader__motion-medium,
+.loader-hourglass .loader__motion-thin{transform-origin:26px 26px}
+.loader-hourglass .loader__motion-thick{animation-name:hg-motion-thick}
+.loader-hourglass .loader__motion-medium{animation-name:hg-motion-medium}
+.loader-hourglass .loader__motion-thin{animation-name:hg-motion-thin}
+.loader-hourglass .loader__sand-drop{animation-name:hg-sand-drop}
+.loader-hourglass .loader__sand-fill{animation-name:hg-sand-fill}
+.loader-hourglass .loader__sand-grain-left{animation-name:hg-sand-grain-left}
+.loader-hourglass .loader__sand-grain-right{animation-name:hg-sand-grain-right}
+.loader-hourglass .loader__sand-line-left{animation-name:hg-sand-line-left}
+.loader-hourglass .loader__sand-line-right{animation-name:hg-sand-line-right}
+.loader-hourglass .loader__sand-mound-top{animation-name:hg-sand-mound-top}
+.loader-hourglass .loader__sand-mound-bottom{animation-name:hg-sand-mound-bottom;transform-origin:12.25px 31.5px}
+
+@keyframes hg-flip{
+  from{transform:translate(13.75px,9.25px) rotate(-180deg)}
+  24%,to{transform:translate(13.75px,9.25px) rotate(0)}
+}
+@keyframes hg-glare-top{
+  from{stroke:rgba(255,255,255,0)}
+  24%,to{stroke:#fff}
+}
+@keyframes hg-glare-bottom{
+  from{stroke:#fff}
+  24%,to{stroke:rgba(255,255,255,0)}
+}
+@keyframes hg-motion-thick{
+  from{animation-timing-function:cubic-bezier(.33,0,.67,0);stroke:rgba(168,121,90,0);stroke-dashoffset:153.94;transform:rotate(.67turn)}
+  20%{animation-timing-function:cubic-bezier(.33,1,.67,1);stroke:#8A5F44;stroke-dashoffset:141.11;transform:rotate(1turn)}
+  40%,to{stroke:rgba(168,121,90,0);stroke-dashoffset:153.94;transform:rotate(1.33turn)}
+}
+@keyframes hg-motion-medium{
+  from,8%{animation-timing-function:cubic-bezier(.33,0,.67,0);stroke:rgba(168,121,90,0);stroke-dashoffset:153.94;transform:rotate(.5turn)}
+  20%{animation-timing-function:cubic-bezier(.33,1,.67,1);stroke:#A8795A;stroke-dashoffset:147.53;transform:rotate(.83turn)}
+  32%,to{stroke:rgba(168,121,90,0);stroke-dashoffset:153.94;transform:rotate(1.17turn)}
+}
+@keyframes hg-motion-thin{
+  from,4%{animation-timing-function:cubic-bezier(.33,0,.67,0);stroke:rgba(168,121,90,0);stroke-dashoffset:153.94;transform:rotate(.33turn)}
+  24%{animation-timing-function:cubic-bezier(.33,1,.67,1);stroke:#C9A578;stroke-dashoffset:134.7;transform:rotate(.67turn)}
+  44%,to{stroke:rgba(168,121,90,0);stroke-dashoffset:153.94;transform:rotate(1turn)}
+}
+@keyframes hg-sand-drop{
+  from,10%{animation-timing-function:cubic-bezier(.12,0,.39,0);stroke-dashoffset:1}
+  70%,to{stroke-dashoffset:-107}
+}
+@keyframes hg-sand-fill{
+  from,10%{animation-timing-function:cubic-bezier(.12,0,.39,0);stroke-dashoffset:55}
+  70%,to{stroke-dashoffset:-54}
+}
+@keyframes hg-sand-grain-left{
+  from,10%{animation-timing-function:cubic-bezier(.12,0,.39,0);stroke-dashoffset:29}
+  70%,to{stroke-dashoffset:-22}
+}
+@keyframes hg-sand-grain-right{
+  from,10%{animation-timing-function:cubic-bezier(.12,0,.39,0);stroke-dashoffset:27}
+  70%,to{stroke-dashoffset:-24}
+}
+@keyframes hg-sand-line-left{
+  from,10%{animation-timing-function:cubic-bezier(.12,0,.39,0);stroke-dashoffset:53}
+  70%,to{stroke-dashoffset:-55}
+}
+@keyframes hg-sand-line-right{
+  from,10%{animation-timing-function:cubic-bezier(.12,0,.39,0);stroke-dashoffset:14}
+  70%,to{stroke-dashoffset:-24.5}
+}
+@keyframes hg-sand-mound-top{
+  from,10%{animation-timing-function:linear;transform:translate(0,0)}
+  15%{animation-timing-function:cubic-bezier(.12,0,.39,0);transform:translate(0,1.5px)}
+  51%,to{transform:translate(0,13px)}
+}
+@keyframes hg-sand-mound-bottom{
+  from,31%{animation-timing-function:cubic-bezier(.61,1,.88,1);transform:scale(1,0)}
+  56%,to{transform:scale(1,1)}
+}
+
+/* 电脑/手机转换 · 深蓝色 */
+.loader-flip-anim{
   width:80px;height:80px;
   position:relative;
-  display:flex;align-items:center;justify-content:center;
+  overflow:visible;
 }
-.loader-goo-scale{
+.loader-flip-anim .flip-inner{
   position:absolute;
-  top:50%;left:50%;
-  width:200px;height:200px;
-  margin:-100px 0 0 -100px;
-  transform:scale(.4);
+  left:50%;top:50%;
+  width:160px;height:160px;
+  margin:-80px 0 0 -80px;
+  transform:scale(.42);
   transform-origin:center center;
 }
-.loader-goo{
-  width:200px;height:200px;
-  position:relative;
-  filter:url("#goo");
-  animation:goo-rotate 2s ease-in-out infinite;
+.loader-flip-anim .flip-cube{
+  position:absolute;
+  top:50%;left:50%;
+  z-index:10;
+  width:160px;height:100px;
+  margin-left:-80px;margin-top:-50px;
+  border-radius:5px;
+  background:#1e3f57;
+  animation:flipDot1 3s cubic-bezier(.55,.3,.24,.99) infinite;
 }
-.loader-goo .dot{
-  width:70px;height:70px;border-radius:50%;
-  position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;
+.loader-flip-anim .flip-cube:nth-child(2){
+  z-index:11;
+  width:150px;height:90px;
+  margin-top:-45px;margin-left:-75px;
+  border-radius:3px;
+  background:#3c517d;
+  animation-name:flipDot2;
 }
-.loader-goo .dot-3{background:#E8834A;animation:dot-3-move 2s ease infinite,dot-index 6s ease infinite}
-.loader-goo .dot-2{background:#4A8DB8;animation:dot-2-move 2s ease infinite,dot-index 6s -4s ease infinite}
-.loader-goo .dot-1{background:#E8B24E;animation:dot-1-move 2s ease infinite,dot-index 6s -2s ease infinite}
-@keyframes dot-3-move{
-  20%{transform:scale(1)}
-  45%{transform:translateY(-18px) scale(.45)}
-  60%{transform:translateY(-90px) scale(.45)}
-  80%{transform:translateY(-90px) scale(.45)}
-  100%{transform:translateY(0) scale(1)}
+.loader-flip-anim .flip-cube:nth-child(3){
+  z-index:12;
+  width:40px;height:20px;
+  margin-top:50px;margin-left:-20px;
+  border-radius:0 0 5px 5px;
+  background:#6bb2cd;
+  animation-name:flipDot3;
 }
-@keyframes dot-2-move{
-  20%{transform:scale(1)}
-  45%{transform:translate(-16px,12px) scale(.45)}
-  60%{transform:translate(-80px,60px) scale(.45)}
-  80%{transform:translate(-80px,60px) scale(.45)}
-  100%{transform:translateY(0) scale(1)}
+@keyframes flipDot1{
+  3%,97%{width:160px;height:100px;margin-top:-50px;margin-left:-80px}
+  30%,36%{width:80px;height:120px;margin-top:-60px;margin-left:-40px}
+  63%,69%{width:40px;height:80px;margin-top:-40px;margin-left:-20px}
 }
-@keyframes dot-1-move{
-  20%{transform:scale(1)}
-  45%{transform:translate(16px,12px) scale(.45)}
-  60%{transform:translate(80px,60px) scale(.45)}
-  80%{transform:translate(80px,60px) scale(.45)}
-  100%{transform:translateY(0) scale(1)}
+@keyframes flipDot2{
+  3%,97%{height:90px;width:150px;margin-left:-75px;margin-top:-45px}
+  30%,36%{width:70px;height:96px;margin-left:-35px;margin-top:-48px}
+  63%,69%{width:32px;height:60px;margin-left:-16px;margin-top:-30px}
 }
-@keyframes goo-rotate{
-  55%{transform:rotate(0deg)}
-  80%{transform:rotate(360deg)}
-  100%{transform:rotate(360deg)}
-}
-@keyframes dot-index{
-  0%,100%{z-index:3}
-  33.3%{z-index:2}
-  66.6%{z-index:1}
+@keyframes flipDot3{
+  3%,97%{height:20px;width:40px;margin-left:-20px;margin-top:50px}
+  30%,36%{width:8px;height:8px;margin-left:-5px;margin-top:49px;border-radius:8px}
+  63%,69%{width:16px;height:4px;margin-left:-8px;margin-top:-37px;border-radius:10px}
 }
 
 /* 金色 spinner */
@@ -1057,7 +1141,6 @@ body::before{
 <!-- ==================== CHAOS 弹窗 ==================== -->
 <div class="chaos-overlay" id="chaosOverlay">
   <div class="chaos-box">
-    <!-- 猫在弹窗右下角 -->
     <div class="chaos-cat">
       <div class="loader-cat">
         <div class="wrapper">
@@ -1083,8 +1166,8 @@ body::before{
               <line stroke-width="4" y2="43" x2="500" y1="43"></line>
               <line stroke-width="4" y2="1.99" x2="115.5" y1="43.01" x1="115.5"></line>
               <line stroke-width="4" y2="2" x2="189" y1="43.01" x1="189"></line>
-              <line stroke-width="4" y2="2.01" x2="262.5" y1="43.02" x2="262.5"></line>
-              <line stroke-width="4" y2="2.01" x2="336" y1="43.02" x2="336"></line>
+              <line stroke-width="4" y2="2.01" x2="262.5" y1="43.02" x1="262.5"></line>
+              <line stroke-width="4" y2="2.01" x2="336" y1="43.02" x1="336"></line>
               <line stroke-width="4" y2="2.02" x2="409.5" y1="43.03" x1="409.5"></line>
               <line stroke-width="4" y2="43" x2="153" y1="84.01" x1="153"></line>
               <line stroke-width="4" y2="43" x2="228" y1="84.01" x1="228"></line>
@@ -1099,7 +1182,6 @@ body::before{
       </div>
     </div>
 
-    <!-- 标题：But + CHAOS 横排 -->
     <div class="chaos-header">
       <svg class="chaos-quote" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M9.6 4C5.4 6.1 3 9.6 3 14.2c0 3.2 2.1 5.8 5.1 5.8 2.6 0 4.5-2 4.5-4.5 0-2.4-1.8-4.3-4.2-4.3-.4 0-.9.1-1 .1.3-2.4 2.4-5.1 4.6-6.3L9.6 4zm10.4 0c-4.2 2.1-6.6 5.6-6.6 10.2 0 3.2 2.1 5.8 5.1 5.8 2.6 0 4.5-2 4.5-4.5 0-2.4-1.8-4.3-4.2-4.3-.4 0-.9.1-1 .1.3-2.4 2.4-5.1 4.6-6.3L20 4z"/>
@@ -1140,14 +1222,16 @@ function enterFullscreen(){
   if (!fn) return;
   try{const r = fn.call(el);if(r && typeof r.catch === 'function') r.catch(() => {});}catch(e){}
 }
+function exitFullscreen(){
+  const fx = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if (!fx) return;
+  try{const r = fx.call(document);if(r && typeof r.catch === 'function') r.catch(() => {});}catch(e){}
+}
 function toggleFullscreen(){
-  const el = document.documentElement;
   if (!document.fullscreenElement && !document.webkitFullscreenElement){
-    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    if (fn){ try{const r = fn.call(el);if(r && typeof r.catch === 'function') r.catch(() => {});}catch(e){} }
+    enterFullscreen();
   } else {
-    const fx = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
-    if (fx){ try{fx.call(document);}catch(e){} }
+    exitFullscreen();
   }
 }
 function enterExperience(){
@@ -1278,16 +1362,51 @@ const chaosCards = [
 
 /* ==================== 卡片内动画池 ==================== */
 const LOADER_HTML = {
-  ring: '<div class="loader-ring"></div>',
   grid: '<span class="loader-grid-anim"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>',
   conic: '<div class="spin-loader"><span></span></div>',
   bars: '<div class="loader-bars-anim">' +
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
         '</div>',
-  goo: '<div class="loader-goo-wrap"><div class="loader-goo-scale"><div class="loader-goo">' +
-       '<div class="dot dot-1"></div><div class="dot dot-2"></div><div class="dot dot-3"></div>' +
-       '</div></div></div>',
+  hourglass: '<svg class="loader-hourglass" role="img" viewBox="0 0 56 56" aria-label="沙漏加载动画">' +
+    '<clipPath id="sand-mound-top"><path d="M 14.613 13.087 C 15.814 12.059 19.3 8.039 20.3 6.539 C 21.5 4.789 21.5 2.039 21.5 2.039 L 3 2.039 C 3 2.039 3 4.789 4.2 6.539 C 5.2 8.039 8.686 12.059 9.887 13.087 C 11 14.039 12.25 14.039 12.25 14.039 C 12.25 14.039 13.5 14.039 14.613 13.087 Z" class="loader__sand-mound-top"></path></clipPath>' +
+    '<clipPath id="sand-mound-bottom"><path d="M 14.613 20.452 C 15.814 21.48 19.3 25.5 20.3 27 C 21.5 28.75 21.5 31.5 21.5 31.5 L 3 31.5 C 3 31.5 3 28.75 4.2 27 C 5.2 25.5 8.686 21.48 9.887 20.452 C 11 19.5 12.25 19.5 12.25 19.5 C 12.25 19.5 13.5 19.5 14.613 20.452 Z" class="loader__sand-mound-bottom"></path></clipPath>' +
+    '<g transform="translate(2,2)">' +
+      '<g transform="rotate(-90,26,26)" stroke-linecap="round" stroke-dashoffset="153.94" stroke-dasharray="153.94 153.94" stroke="hsl(0,0%,100%)" fill="none">' +
+        '<circle transform="rotate(0,26,26)" r="24.5" cy="26" cx="26" stroke-width="2.5" class="loader__motion-thick"></circle>' +
+        '<circle transform="rotate(90,26,26)" r="24.5" cy="26" cx="26" stroke-width="1.75" class="loader__motion-medium"></circle>' +
+        '<circle transform="rotate(180,26,26)" r="24.5" cy="26" cx="26" stroke-width="1" class="loader__motion-thin"></circle>' +
+      '</g>' +
+      '<g transform="translate(13.75,9.25)" class="loader__model">' +
+        '<path d="M 1.5 2 L 23 2 C 23 2 22.5 8.5 19 12 C 16 15.5 13.5 13.5 13.5 16.75 C 13.5 20 16 18 19 21.5 C 22.5 25 23 31.5 23 31.5 L 1.5 31.5 C 1.5 31.5 2 25 5.5 21.5 C 8.5 18 11 20 11 16.75 C 11 13.5 8.5 15.5 5.5 12 C 2 8.5 1.5 2 1.5 2 Z" fill="#E0C4AE"></path>' +
+        '<g stroke-linecap="round" stroke="#F5EFE3">' +
+          '<line y2="20.75" x2="12" y1="15.75" x1="12" stroke-dasharray="0.25 33.75" stroke-width="1" class="loader__sand-grain-left"></line>' +
+          '<line y2="21.75" x2="12.5" y1="16.75" x1="12.5" stroke-dasharray="0.25 33.75" stroke-width="1" class="loader__sand-grain-right"></line>' +
+          '<line y2="31.5" x2="12.25" y1="18" x1="12.25" stroke-dasharray="0.5 107.5" stroke-width="1" class="loader__sand-drop"></line>' +
+          '<line y2="31.5" x2="12.25" y1="14.75" x1="12.25" stroke-dasharray="54 54" stroke-width="1.5" class="loader__sand-fill"></line>' +
+          '<line y2="31.5" x2="12" y1="16" x1="12" stroke-dasharray="1 107" stroke-width="1" stroke="#F5EFE3" class="loader__sand-line-left"></line>' +
+          '<line y2="31.5" x2="12.5" y1="16" x1="12.5" stroke-dasharray="12 96" stroke-width="1" stroke="#F5EFE3" class="loader__sand-line-right"></line>' +
+          '<g stroke-width="0" fill="#F5EFE3">' +
+            '<path d="M 12.25 15 L 15.392 13.486 C 21.737 11.168 22.5 2 22.5 2 L 2 2.013 C 2 2.013 2.753 11.046 9.009 13.438 L 12.25 15 Z" clip-path="url(#sand-mound-top)"></path>' +
+            '<path d="M 12.25 18.5 L 15.392 20.014 C 21.737 22.332 22.5 31.5 22.5 31.5 L 2 31.487 C 2 31.487 2.753 22.454 9.009 20.062 Z" clip-path="url(#sand-mound-bottom)"></path>' +
+          '</g>' +
+        '</g>' +
+        '<g stroke-width="2" stroke-linecap="round" opacity="0.7" fill="none">' +
+          '<path d="M 19.437 3.421 C 19.437 3.421 19.671 6.454 17.914 8.846 C 16.157 11.238 14.5 11.5 14.5 11.5" stroke="#fff" class="loader__glare-top"></path>' +
+          '<path transform="rotate(180,12.25,16.75)" d="M 19.437 3.421 C 19.437 3.421 19.671 6.454 17.914 8.846 C 16.157 11.238 14.5 11.5 14.5 11.5" stroke="rgba(255,255,255,0)" class="loader__glare-bottom"></path>' +
+        '</g>' +
+        '<rect height="2" width="24.5" fill="#8A5F44"></rect>' +
+        '<rect height="1" width="19.5" y="0.5" x="2.5" ry="0.5" rx="0.5" fill="#A8795A"></rect>' +
+        '<rect height="2" width="24.5" y="31.5" fill="#8A5F44"></rect>' +
+        '<rect height="1" width="19.5" y="32" x="2.5" ry="0.5" rx="0.5" fill="#A8795A"></rect>' +
+      '</g>' +
+    '</g>' +
+  '</svg>',
+  flip: '<div class="loader-flip-anim"><div class="flip-inner">' +
+        '<div class="flip-cube"></div>' +
+        '<div class="flip-cube"></div>' +
+        '<div class="flip-cube"></div>' +
+        '</div></div>',
   spinner: '<div class="loader-spinner-anim"></div>',
   boot: '<span class="loader-boot-anim"></span>'
 };
@@ -1607,11 +1726,6 @@ document.addEventListener('keydown', (e) => {
   }
   if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
-  if (e.code === 'KeyF'){
-    e.preventDefault();
-    toggleFullscreen();
-    return;
-  }
   if (e.code === 'Space'){
     e.preventDefault();
     togglePlayPause();
@@ -1621,6 +1735,9 @@ document.addEventListener('keydown', (e) => {
   } else if (e.code === 'Digit2'){
     e.preventDefault();
     if (!dareBtn.disabled) updateDare();
+  } else if (e.code === 'KeyF'){
+    e.preventDefault();
+    toggleFullscreen();
   }
 });
 
