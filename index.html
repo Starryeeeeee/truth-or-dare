@@ -176,14 +176,21 @@ body::before{
   --card-line-fill:#C3AC83;
   --base-w:321px;
   --base-h:270px;
+  --folder-scale:1.6;
 }
 .intro-folder-scale{
   transform:scale(.32);
   transition:transform 1s cubic-bezier(.34,1.2,.5,1);
 }
 #folderOverlay.show .intro-folder-scale{
-  transform:scale(1);
+  transform:scale(var(--folder-scale));
 }
+/* 信封整体尺寸随视口缩放：默认面向投影/大屏 */
+@media (max-height:860px){:root{--folder-scale:1.4}}
+@media (max-height:720px){:root{--folder-scale:1.18}}
+@media (max-height:520px){:root{--folder-scale:.9}}
+@media (min-height:1300px){:root{--folder-scale:1.85}}
+@media (max-width:560px){:root{--folder-scale:1}}
 .folder{
   position:relative;width:var(--base-w);height:var(--base-h);
   display:block;cursor:pointer;
@@ -232,45 +239,59 @@ body::before{
 .flap svg{position:absolute;inset:0;width:100%;height:100%;}
 
 .folder-hint{
-  margin-top:80px;display:flex;align-items:center;gap:16px;
-  font-family:var(--font-hand);font-size:22px;color:var(--ink-soft);
-  letter-spacing:.24em;transition:opacity .4s;
+  margin-top:48px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  transition:opacity .4s;
 }
 .folder-hint.hide{opacity:0;}
+.folder-hint .hint-row{display:flex;align-items:center;gap:14px;}
 .folder-hint .pulse{
-  width:14px;height:14px;border-radius:50%;background:#E8B24E;
+  width:12px;height:12px;border-radius:50%;background:#E8B24E;
   box-shadow:0 0 14px rgba(232,178,78,.9);
   animation:googlePulse 1.8s ease-in-out infinite;flex-shrink:0;
 }
+.hint-cn{
+  font-family:var(--font-hand);
+  font-size:28px;font-weight:500;line-height:1;
+  color:var(--ink-soft);
+  letter-spacing:.22em;margin-right:-.22em;
+}
+.hint-en{
+  font-family:var(--font-serif);
+  font-style:italic;font-size:14px;line-height:1;
+  color:var(--ink-faint);
+  letter-spacing:.28em;margin-right:-.28em;
+  text-transform:uppercase;
+}
 
 /* ============================================================
-   三、信纸卡片（极简排版）
+   三、信纸卡片（极简排版 · 已放大）
    ============================================================ */
 .intro-letter{
   position:fixed;left:50%;top:50%;
-  width:min(520px, 90vw);
+  width:min(880px, 94vw);
   transform:translate(-50%,-50%) scale(.4) translateY(40px);
   opacity:0;pointer-events:none;
   background:#FDFBF6;
   background-image:
     radial-gradient(circle at 20% 30%, rgba(180,150,80,.035) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, rgba(180,150,80,.025) 0%, transparent 50%);
-  border-radius:12px;
+  border-radius:14px;
   box-shadow:
     0 1px 2px rgba(80,60,30,.06),
     0 4px 12px rgba(80,60,30,.08),
     0 12px 32px -8px rgba(80,60,30,.16),
     0 24px 56px -16px rgba(80,60,30,.20);
-  padding:44px 48px 40px;
+  padding:66px 74px 60px;
   transition:transform .75s cubic-bezier(.34,1.2,.5,1), opacity .45s ease;
   z-index:9999;display:flex;flex-direction:column;
 }
 .intro-letter.show{transform:translate(-50%,-50%) scale(1) translateY(0);opacity:1;pointer-events:auto;}
 .intro-letter.exit{transform:translate(-50%, 60vh) scale(.85);opacity:0;pointer-events:none;}
 
-.letter-head{display:flex;align-items:center;gap:18px;margin-bottom:26px;}
+.letter-head{display:flex;align-items:center;gap:24px;margin-bottom:38px;}
 .letter-head-gif{
-  width:64px;height:64px;flex-shrink:0;
+  width:92px;height:92px;flex-shrink:0;
   object-fit:contain;display:block;
   animation:gifFloat 3.2s ease-in-out infinite;
 }
@@ -278,37 +299,37 @@ body::before{
 .letter-head-text{display:flex;flex-direction:column;}
 .letter-title{
   font-family:var(--font-hand);
-  font-size:1.9rem;font-weight:600;
+  font-size:2.9rem;font-weight:600;
   color:var(--ink);letter-spacing:.08em;line-height:1.15;
 }
 .letter-sub{
   font-family:var(--font-serif);
-  font-style:italic;font-size:12px;
+  font-style:italic;font-size:15px;
   color:var(--ink-faint);
   letter-spacing:.28em;text-transform:uppercase;
-  margin-top:4px;
+  margin-top:8px;
 }
 
 .rule-list{
   display:flex;flex-direction:column;
-  gap:18px;
+  gap:30px;
   counter-reset:rule;
 }
 .rule-item{
-  display:flex;align-items:baseline;gap:16px;
+  display:flex;align-items:baseline;gap:22px;
   counter-increment:rule;
 }
 .rule-item::before{
   content:counter(rule) ".";
-  flex-shrink:0;width:18px;
+  flex-shrink:0;width:34px;
   font-family:var(--font-serif);
-  font-size:1.05rem;font-weight:700;font-style:italic;
-  color:var(--gold);line-height:1.75;
+  font-size:1.6rem;font-weight:700;font-style:italic;
+  color:var(--gold);line-height:1.7;
 }
 .rule-text{
   flex:1;
   font-family:var(--font-round);
-  font-size:15px;line-height:1.75;
+  font-size:23px;line-height:1.8;
   color:var(--ink);letter-spacing:.01em;
 }
 .rule-text strong{color:var(--dare-dark);font-weight:700;}
@@ -418,7 +439,8 @@ body.stage-main .pixar-card:hover{
 }
 .card-header{display:flex;align-items:center;margin-bottom:0.9em;}
 .card-avatar{
-  width:76px;height:76px;flex-shrink:0;
+  width:92px;height:92px;flex-shrink:0;
+  margin-left:10px;
   transition:transform 0.35s ease;
   display:flex;align-items:center;justify-content:center;
   line-height:0;
@@ -426,9 +448,9 @@ body.stage-main .pixar-card:hover{
 .pixar-card:hover .card-avatar{transform:scale(1.06) rotate(6deg);}
 .card-avatar img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;}
 .card-username{
-  margin-left:0.85em;
+  margin-left:1em;
   font-family:var(--font-hand);
-  font-size:1.55em;font-weight:600;
+  font-size:2em;font-weight:600;
   color:var(--ui-dark);letter-spacing:.08em;line-height:1.15;
 }
 .card-subname{
@@ -515,16 +537,15 @@ body.stage-main .pixar-card:hover{
   padding:0.8em 0.85em;cursor:pointer;
   font-family:var(--font-hand);font-size:1.1em;font-weight:600;
   color:var(--ui-dark);letter-spacing:.14em;
-  box-shadow:0 var(--button-press-depth) 0 var(--ui-orange-shadow), 0 0.45em 0 var(--ui-dark);
+  box-shadow:0.4em 0.4em 0 var(--ui-dark), 0.65em 0.65em 0 #1a1a18;
   transition:transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s;
 }
 .truth-card .draw-button{
   background:var(--ui-blue);
-  box-shadow:0 var(--button-press-depth) 0 var(--ui-blue-shadow), 0 0.45em 0 var(--ui-dark);
 }
 .draw-button:hover{filter:brightness(1.05);}
-.truth-card .draw-button:active{transform:translateY(var(--button-press-depth));box-shadow:0 0 0 var(--ui-blue-shadow), 0 var(--button-press-depth) 0 var(--ui-dark);}
-.dare-card .draw-button:active{transform:translateY(var(--button-press-depth));box-shadow:0 0 0 var(--ui-orange-shadow), 0 var(--button-press-depth) 0 var(--ui-dark);}
+.truth-card .draw-button:active{transform:translate(var(--button-press-depth),var(--button-press-depth));box-shadow:var(--button-press-depth) var(--button-press-depth) 0 var(--ui-dark);}
+.dare-card .draw-button:active{transform:translate(var(--button-press-depth),var(--button-press-depth));box-shadow:var(--button-press-depth) var(--button-press-depth) 0 var(--ui-dark);}
 .draw-button:disabled{cursor:not-allowed;filter:grayscale(.5);opacity:.55;transform:none;}
 .draw-button .btn-icon{font-size:1.05em;line-height:1;}
 
@@ -611,6 +632,190 @@ body.stage-main .pixar-card:hover{
 .chaos-close:active{
   transform:translate(2px,2px);
   box-shadow:2px 2px 0 var(--ui-dark), 3px 3px 0 #1a1a18;
+}
+
+/* ============================================================
+   CHAOS 卡片右下角小狗（em 单位版）
+   ============================================================ */
+.chaos-dog{
+  position:absolute;
+  right:36px;
+  bottom:20px;
+  pointer-events:none;
+  opacity:.94;
+  z-index:1;
+}
+.chaos-dog .main{
+  /* ★ 改这一个值即可整体缩放小狗 */
+  font-size:5.2px;
+  position:relative;
+  width:23.5em;
+  height:13em;
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  isolation:isolate;
+}
+.chaos-dog .leg{position:absolute;bottom:0;width:2em;height:2.125em;}
+.chaos-dog .paw{position:absolute;bottom:2px;left:0;width:1.95em;height:1.8em;overflow:hidden;}
+.chaos-dog .paw::before{content:"";position:absolute;width:5em;height:3em;border-radius:50%;}
+.chaos-dog .top{
+  position:absolute;bottom:0;left:0.75em;
+  height:4.5em;width:2.625em;
+  border-top-left-radius:1.425em;border-top-right-radius:1.425em;
+  transform-origin:bottom right;
+  transform:rotateZ(90deg) translateX(-0.1em) translateY(1.5em);
+  z-index:-1;
+  background-image:linear-gradient(70deg, transparent 20%, #deac80 20%);
+}
+.chaos-dog .dog{position:relative;width:20em;height:8em;}
+.chaos-dog .dog::before{
+  content:"";position:absolute;
+  bottom:-0.75em;right:-0.15em;
+  width:100%;height:1.5em;
+  background-color:#b5c18e;border-radius:50%;
+  z-index:-1000;
+  animation:puppyShadow 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__head{
+  position:absolute;left:4.5em;bottom:0;
+  width:8em;height:5em;
+  border-top-left-radius:4.05em;border-top-right-radius:4.05em;
+  border-bottom-right-radius:3.3em;border-bottom-left-radius:3.3em;
+  background-color:#deac80;
+  animation:puppyHead 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__head-c{
+  position:absolute;left:1.5em;bottom:0;
+  width:9.75em;height:8.25em;
+  animation:puppyHead 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+  z-index:-1;
+}
+.chaos-dog .dog__snout{
+  position:absolute;left:-1.5em;bottom:0;
+  width:7.5em;height:3.75em;
+  border-top-right-radius:3em;border-bottom-right-radius:3em;
+  border-bottom-left-radius:4.5em;
+  background-color:#f7dcb9;
+  animation:puppySnout 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__snout::before{
+  content:"";position:absolute;
+  left:-0.1125em;top:-0.15em;
+  width:1.875em;height:1.125em;
+  border-top-right-radius:3em;border-bottom-right-radius:3em;
+  border-bottom-left-radius:4.5em;
+  background-color:#6c4e31;
+  animation:puppySnoutB 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__nose{
+  position:absolute;top:-1.95em;left:40%;
+  width:0.75em;height:2.4em;
+  border-radius:0.525em;
+  transform-origin:bottom;transform:rotateZ(10deg);
+  background-color:#d7dbd2;
+}
+.chaos-dog .dog__eye-l,
+.chaos-dog .dog__eye-r{
+  position:absolute;top:-0.9em;
+  width:0.675em;height:0.375em;
+  border-radius:50%;background-color:#1c3130;
+  animation:puppyEye 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__eye-l{left:27%;}
+.chaos-dog .dog__eye-r{left:65%;}
+.chaos-dog .dog__ear-l,
+.chaos-dog .dog__ear-r{
+  position:absolute;
+  width:5em;height:3.3em;
+  border-top-left-radius:3.3em;border-top-right-radius:3em;
+  border-bottom-right-radius:5em;border-bottom-left-radius:5em;
+  background-color:#deac80;
+}
+.chaos-dog .dog__ear-l{
+  top:1.5em;left:10em;
+  transform-origin:bottom left;transform:rotateZ(-50deg);
+  z-index:-1;
+  animation:puppyEarL 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__ear-r{
+  top:1.5em;right:3em;
+  transform-origin:bottom right;transform:rotateZ(25deg);
+  z-index:-2;
+  animation:puppyEarR 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__body{
+  display:flex;justify-content:center;align-items:flex-end;
+  position:absolute;bottom:0.3em;left:6em;
+  width:18em;height:4em;
+  border-top-left-radius:3em;border-top-right-radius:6em;
+  border-bottom-right-radius:1.5em;border-bottom-left-radius:6em;
+  background-color:#914f1e;
+  z-index:-2;
+  animation:puppyBody 10s cubic-bezier(0.3,0.41,0.18,1.01) infinite;
+}
+.chaos-dog .dog__tail{
+  position:absolute;top:1.4em;right:-1.5em;
+  height:3em;width:4em;
+  background-color:#914f1e;border-radius:1.5em;
+}
+.chaos-dog .dog__paws{
+  position:absolute;bottom:0;left:7.5em;
+  width:10em;height:3em;
+}
+.chaos-dog .dog__bl-leg{left:-3em;z-index:-10;}
+.chaos-dog .dog__bl-paw::before{background-color:#fffbe6;}
+.chaos-dog .dog__bl-top{background-image:linear-gradient(80deg, transparent 20%, #deac80 20%);}
+.chaos-dog .dog__fl-leg{z-index:10;left:0;}
+.chaos-dog .dog__fl-paw::before{background-color:#fffbe6;}
+.chaos-dog .dog__fr-leg{right:0;}
+.chaos-dog .dog__fr-paw::before{background-color:#fffbe6;}
+
+@keyframes puppyHead{
+  0%,10%,20%,26%,28%,90%,100%{
+    height:8.25em;bottom:0;
+    transform-origin:bottom right;transform:rotateZ(0);
+  }
+  5%,15%,22%,24%,30%{height:8.1em;}
+  32%,50%{height:8.25em;}
+  55%,60%{bottom:0.75em;transform-origin:bottom right;transform:rotateZ(0);}
+  70%,80%{bottom:0.75em;transform-origin:bottom right;transform:rotateZ(10deg);}
+}
+@keyframes puppyBody{
+  0%,10%,20%,26%,28%,32%,100%{height:7.2em;}
+  5%,15%,22%,24%,30%{height:7.05em;}
+}
+@keyframes puppyEarL{
+  0%,10%,20%,26%,28%,82%,100%{transform:rotateZ(-50deg);}
+  5%,15%,22%,24%{transform:rotateZ(-48deg);}
+  30%,31%{transform:rotateZ(-30deg);}
+  32%,80%{transform:rotateZ(-60deg);}
+}
+@keyframes puppyEarR{
+  0%,10%,20%,26%,28%{transform:rotateZ(20deg);}
+  5%,15%,22%,24%{transform:rotateZ(18deg);}
+  30%,31%{transform:rotateZ(10deg);}
+  32%{transform:rotateZ(25deg);}
+}
+@keyframes puppySnout{
+  0%,10%,20%,26%,28%,82%,100%{height:3.75em;}
+  5%,15%,22%,24%{height:3.45em;}
+}
+@keyframes puppySnoutB{
+  0%,10%,20%,26%,28%,98%,100%{width:1.875em;}
+  5%,15%,22%,24%{width:1.8em;}
+  34%,98%{width:1.275em;}
+}
+@keyframes puppyShadow{
+  0%,10%,20%,26%,28%,30%,84%,100%{width:99%;}
+  5%,15%,22%,24%{width:101%;}
+  34%,81%{width:96%;}
+}
+@keyframes puppyEye{
+  0%,30%{width:0.675em;height:0.3em;}
+  32%,59%,90%,100%{width:0.525em;height:0.525em;transform:translateY(0);}
+  60%,75%{transform:translateY(-0.3em);}
+  80%,85%{transform:translateY(0.15em);}
 }
 
 /* 卡片内动画池 */
@@ -955,7 +1160,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .header-line2{font-size:16px;letter-spacing:.28em;}
   .cards-panel{gap:44px;flex-wrap:wrap;}
   .pixar-card{max-width:100%;padding:1.1em;}
-  .card-avatar{width:66px;height:66px;}
+  .card-avatar{width:80px;height:80px;margin-left:8px;}
   .card-username{font-size:1.5em;}
   .card-image-area{min-height:190px;}
   .card-question{font-size:1.2em;}
@@ -967,6 +1172,8 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .chaos-name{font-size:1.9rem}
   .chaos-desc{font-size:1rem}
   .chaos-actions{padding-left:0;text-align:center}
+  .chaos-dog{right:24px;bottom:14px;}
+  .chaos-dog .main{font-size:4px;}
   .tool-fab{left:16px;bottom:16px;width:50px;height:50px;}
   .tool-main{width:50px;height:50px;}
   .tool-main svg{width:22px;height:22px;}
@@ -976,17 +1183,17 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .tool-fab.open .tool-item.i3{transform:translate(76px, -4px) scale(1);}
   .volume-popover{width:190px;padding:14px 16px 12px;}
   .vinyl-player{right:16px;bottom:16px;}
-  .intro-letter{width:94vw;padding:32px 26px 30px;}
-  .letter-head{gap:14px;margin-bottom:20px;}
-  .letter-head-gif{width:52px;height:52px;}
-  .letter-title{font-size:1.55rem;}
-  .rule-list{gap:14px;}
-  .rule-item{gap:12px;}
-  .rule-item::before{width:16px;font-size:.95rem;}
-  .rule-text{font-size:14px;}
+  .intro-letter{width:94vw;padding:40px 32px 36px;border-radius:12px;}
+  .letter-head{gap:18px;margin-bottom:26px;}
+  .letter-head-gif{width:68px;height:68px;}
+  .letter-title{font-size:2rem;}
+  .letter-sub{font-size:13px;}
+  .rule-list{gap:20px;}
+  .rule-item{gap:16px;}
+  .rule-item::before{width:24px;font-size:1.2rem;}
+  .rule-text{font-size:19px;}
   .google-loader-wrap{gap:120px;transform:translateY(20px);}
   .google-hint-text{font-size:20px;}
-  .folder-hint{margin-top:56px;font-size:18px;}
 }
 </style>
 </head>
@@ -1095,11 +1302,14 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
         </div>
       </div>
     </label>
-  </div>
 
-  <div class="folder-hint" id="folderHint">
-    <span class="pulse"></span>
-    <span>点击查看游戏规则</span>
+    <div class="folder-hint" id="folderHint">
+      <div class="hint-row">
+        <span class="pulse"></span>
+        <span class="hint-cn">点击查看游戏规则</span>
+      </div>
+      <span class="hint-en">Game Rules Inside</span>
+    </div>
   </div>
 </div>
 
@@ -1124,7 +1334,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       <div class="rule-text">口头选择<strong>「真心话」</strong>或<strong>「大冒险」</strong>后，主持人代为点击。</div>
     </div>
     <div class="rule-item">
-      <div class="rule-text">每人抽取后都有 <strong>20% 概率触发 CHAOS 随机牌</strong>，让游戏更有惊喜！</div>
+      <div class="rule-text">每次抽取都有 <strong>20% 概率触发 CHAOS 随机牌</strong>，让游戏更有惊喜！</div>
     </div>
   </div>
 </div>
@@ -1167,7 +1377,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       </div>
       <div class="card-footer">
         <div class="card-count">
-          <span class="num" id="truthId">2</span>
+          <span class="num" id="truthId">50</span>
           <span class="lbl">剩余</span>
         </div>
         <button class="draw-button" id="drawTruthBtn">
@@ -1200,7 +1410,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       </div>
       <div class="card-footer">
         <div class="card-count">
-          <span class="num" id="dareId">2</span>
+          <span class="num" id="dareId">50</span>
           <span class="lbl">剩余</span>
         </div>
         <button class="draw-button" id="drawDareBtn">
@@ -1236,6 +1446,43 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       <button class="chaos-close" id="chaosCloseBtn">
         <i class="fas fa-check btn-icon"></i> OK
       </button>
+    </div>
+
+    <!-- ★ 右下角小狗 -->
+    <div class="chaos-dog" aria-hidden="true">
+      <div class="main">
+        <div class="dog">
+          <div class="dog__paws">
+            <div class="dog__bl-leg leg">
+              <div class="dog__bl-paw paw"></div>
+              <div class="dog__bl-top top"></div>
+            </div>
+            <div class="dog__fl-leg leg">
+              <div class="dog__fl-paw paw"></div>
+              <div class="dog__fl-top top"></div>
+            </div>
+            <div class="dog__fr-leg leg">
+              <div class="dog__fr-paw paw"></div>
+              <div class="dog__fr-top top"></div>
+            </div>
+          </div>
+          <div class="dog__body">
+            <div class="dog__tail"></div>
+          </div>
+          <div class="dog__head">
+            <div class="dog__snout">
+              <div class="dog__eyes">
+                <div class="dog__eye-l"></div>
+                <div class="dog__eye-r"></div>
+              </div>
+            </div>
+          </div>
+          <div class="dog__head-c">
+            <div class="dog__ear-r"></div>
+            <div class="dog__ear-l"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1515,23 +1762,106 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: true });
 
 /* ==================== 题库 ==================== */
+/* 真心话：轻松趣味 + 搞怪自曝 + 社团/科技梗，全场合安全（不涉隐私深水区） */
 const truthList = [
+  "你最近一次熬夜到凌晨是在干什么？",
+  "你最近一次撒的谎是什么？小谎也算。",
+  "你给老师或同学发消息，有没有手滑发错过人？后来怎么样了？",
+  "你的第一个网名是什么？为什么会想到这个名字？",
+  "第一次来社团报到时，你心里其实在想什么？",
+  "你做过最幼稚但坚持到今天的事是什么？",
+  "你最害怕的东西是什么？蟑螂、高数都算。",
+  "说出一件你买回来只用过一次的东西。",
+  "你觉得自己三年后在过什么样的生活？说具体点。",
+  "如果明天就是世界末日，你今晚最想干的三件事是什么？",
+  "你觉得自己最像哪种动物？为什么？",
+  "如果给社团全社大会新增一个环节，你想加什么？",
+  "你收到过最离谱的礼物是什么？",
+  "你做过最想从记忆里删掉的一件糗事是什么？当时有几个人在场？",
+  "来到一中这么久，你有留意过自己从起床到抵达教室花费的最短时间吗？是因为什么特殊原因，有没有省掉什么步骤？",
+  "你写过的最套路的请假理由是什么？老师看到后是什么反应？最后请假成功了吗？",
+  "你是否有一个坚持了很久的小迷信？比如考前不洗头。",
+  "你买过最失败的科技产品是什么？花了多少冤枉钱？",
+  "你手机屏幕使用时间第一的 App 是什么？敢报日均时长吗？现在还是你在追求的吗？如果不是了，是否愿意分享原因呢？",
+  "你逃过课吗？逃课去干嘛了？",
+  "你买东西最冲动的一次，花了多少钱买了什么？",
+  "如果给你一天当社长，你最想在社团推行什么奇怪点子？",
+  "学期初咱们社团的周边售卖，你有来吗？如果让你来决定卖哪些新周边，你会选择什么？定价多少？",
   "你做过最『社死』的事情是什么？后来怎么圆的？",
-  "如果社团突然获得一笔巨款，你第一个建议买什么？"
+  "你最不能忍受同伴的哪个习惯？建议不要点名哦",
+  "你小时候的梦想是什么？",
+  "如果社团突然获得一笔巨款，你第一个建议买什么？",
+  "你最想和谁交换人生一天？在座的也可以。",
+  "你收到过最难忘的夸奖是什么？谁夸的？",
+  "你最想拥有哪种超能力？要说出具体用途。",
+  "你宿舍或家里最神奇的一件收藏品是什么？",
+  "是否愿意分享你给别人起过的最肉麻的备注？能分享原因吗？",
+  "你愿意分享手机里最舍不得删的聊天框吗？为什么？",
+  "如果期末可以开卷考一科，你选哪科？为什么偏偏是它？",
+  "用一句真心话评价今天的活动，夸奖或吐槽都行。"
 ];
 
+/* 大冒险：现场即可完成，表演/模仿/互动为主，无肢体接触、无离场任务 */
 const dareList = [
-  "模仿一个电脑蓝屏的画面，保持僵住 5 秒，然后说『重启中』。",
-  "用严肃的新闻主播语气说：『最新消息，本社团的 3D 打印机又堵了。』"
+  "模仿一种动物的叫声和动作，让全场猜是什么。",
+  "用新闻联播的语气播报：「本社团今日活动圆满，同学情绪稳定。」",
+  "站起来唱《孤勇者》副歌，要求真情实感。",
+  "表演「手机只剩1%电量时的你」，坚持10秒。",
+  "用文言文说「我饿了，想吃火锅」，情绪要饱满。",
+  "和左边的人对视5秒，然后真诚地夸对方一个优点。",
+  "用最浮夸的电视购物腔，安利你手边的任意物品。",
+  "即兴来一段四句的 rap，主题：今晚的社团活动。",
+  "表演你早上被闹钟叫醒的全过程。",
+  "用三种不同的情绪说「明天要交作业」。",
+  "用三种方言或腔调说「奇思科创社，牛！」。",
+  "假装成现场记者，采访一位同学两个问题。",
+  "表演「Wi-Fi 卡顿的人」，坚持到有人笑场。",
+  "用最温柔的声音说一句最扎心的狠话。",
+  "连续表演「学霸做题」和「学渣做题」各5秒。",
+  "模仿你手机里最常用的一个表情，让全场猜。",
+  "接下来一个问题，你必须用唱歌的方式回答。",
+  "表演「代码终于跑通了」的狂喜，持续5秒。",
+  "模仿打印机卡纸的声音和形态，越像越好。",
+  "走到门口大喊「我是奇思科创社最靓的仔」，然后淡定走回来。",
+  "让右边的人给你一句台词，你用偶像剧腔演出来。",
+  "表演「开黑赢了」和「开黑输了」两种反应，各5秒。",
+  "用身体摆出一个英文字母，让全场猜是哪个。",
+  "接下来一分钟，你说的每句话都必须以「科学研究表明」开头。",
+  "用嘴模仿一段手机铃声或闹钟声，让全场猜是什么。",
+  "和一位同学组队玩「你比划我猜」，题目由主持人出，比如「3D打印机」。",
+  "表演「周日晚上八点想起作业没写」的你。",
+  "大声说出你的手机壁纸是什么，并解释为什么是它。",
+  "用乐评人的口吻点评现场音乐，至少说两句专业术语。",
+  "即兴赋诗一首，主题由左边的人指定，四句以内。",
+  "把「多喝热水」翻译成十种不同的安慰说法。",
+  "重新表演一遍你第一次上台自我介绍的样子。",
+  "和对面的人猜拳，输的人做10个深蹲并大声计数。",
+  "用主持人的腔调宣布「本次大会圆满结束，散会！」，然后自己坐回去。",
+  "表演「网课掉线又重新连上」的全过程。",
+  "和一位同学组成「人形打印机」：你做打字动作，TA 配音，表演10秒。",
+  "用弹幕语气实时解说现场，直到主持人喊停。",
+  "模仿一个动漫角色的经典台词和动作。",
+  "表演「在图书馆突然想笑但必须忍住」，坚持10秒。",
+  "对主持人连续说三句夸奖，每句必须含一个成语。",
+  "表演「刚出厂的机器人学习人类微笑」，切换三种笑法。",
+  "深情朗读：「遇见你，是我今天手气最差的安慰。」对象由主持人指定。",
+  "表演「吃了一口柠檬但强装没事」，坚持5秒。",
+  "打开输入法输入「社团」并连选三个联想词，大声念出结果。",
+  "模仿电脑蓝屏的画面，僵住5秒，然后说「重启中」。",
+  "用手势舞或自由发挥跳10秒舞，背景音乐自己嘴哼。",
+  "表演「你的电脑正在更新，进度卡在99%」，坚持到有人笑。",
+  "表演「考场上笔没水了，向周围人无声求助」的全过程。",
+  "现场找一位同学，你们合唱一句任意儿歌。",
+  "用主持人的语气复述 TA 刚说过的话，但要加上戏精式气泡音。"
 ];
 
 const chaosCards = [
-  { name: "移花接木",     desc: "把你抽到的题目，交给现场另一位同学完成。" },
+  { name: "移花接木", desc: "把你抽到的题目，交给现场另一位同学完成。" },
   { name: "同舟共济", desc: "在现场找一位同学，与你共同完成这个挑战。" },
-  { name: "偷梁换柱",     desc: "把刚才的选择换成另一个并重抽一次。" },
-  { name: "万箭齐发",     desc: "完成当前挑战后，你得再抽一次。" },
-  { name: "暗度陈仓",     desc: "本轮安全通过，你可以选择不用完成。" },
-  { name: "随机选择", desc: "完成后，你可直接指定下一位挑战者。" }
+  { name: "偷梁换柱", desc: "把刚才的选择换成另一个，并重抽一次。" },
+  { name: "祸不单行", desc: "先把你抽到的挑战做完，完成之后还得再抽一次。" },
+  { name: "金蝉脱壳", desc: "本轮安全通过，你可以选择不用完成。" },
+  { name: "祸水东引", desc: "完成后，由你指定下一位被挑战的同学。" }
 ];
 
 /* ==================== 卡片内动画池 ==================== */
@@ -1630,7 +1960,7 @@ function updateButtonStates(){
     dareBtn.innerHTML = '<i class="fas fa-dice-d6 btn-icon"></i><span>抽取大冒险</span>';
   }
   if (truthPool.length === 0 && darePool.length === 0){
-    showToast('两个题库都耗尽了，请考虑重置', 3200);
+    showToast('题库都被你们抽空啦！点左下角刷新按钮，再来一轮', 3200);
   }
 }
 
@@ -1990,6 +2320,8 @@ document.addEventListener('keydown', (e) => {
 /* ==================== 初始化 ==================== */
 updateButtonStates();
 updateTrackInfo();
+truthId.textContent = truthPool.length;
+dareId.textContent  = darePool.length;
 vinylPlayer.classList.add('paused');
 </script>
 </body>
