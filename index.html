@@ -54,7 +54,24 @@ body::before{
     radial-gradient(circle at 12% 8%, rgba(232,178,78,.10), transparent 42%),
     radial-gradient(circle at 88% 92%, rgba(74,141,184,.10), transparent 42%),
     radial-gradient(circle at 92% 12%, rgba(232,131,74,.07), transparent 40%);
+  transition:opacity .9s ease;
 }
+body.stage-main::before{opacity:0;}
+
+/* ============================================================
+   ★ 天空背景 iframe（Three.js 场景）
+   ============================================================ */
+#skyBg{
+  position:fixed;inset:0;
+  width:100vw;height:100vh;
+  border:0;display:block;
+  z-index:0;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .9s ease;
+  background:transparent;
+}
+body.stage-main #skyBg{opacity:1;}
 
 /* ============================================================
    一、Google 加载动画遮罩
@@ -329,7 +346,7 @@ body::before{
 .rule-text{
   flex:1;
   font-family:var(--font-round);
-  font-size:23px;line-height:1.8;
+  font-size:26px;line-height:1.8;
   color:var(--ink);letter-spacing:.01em;
 }
 .rule-text strong{color:var(--dare-dark);font-weight:700;}
@@ -345,6 +362,7 @@ body::before{
   justify-content:center;
   align-items:center;
   overflow:hidden;
+  background:transparent;
 }
 
 .header{
@@ -357,7 +375,7 @@ body::before{
   filter:drop-shadow(0 8px 22px rgba(0,90,158,.35));
   animation:logoFloat 3.4s ease-in-out infinite;
   opacity:0;transform:translateX(-300px);
-  transition:opacity .9s ease, transform 1.1s cubic-bezier(.34,1.1,.5,1);
+  transition:opacity .9s ease, transform 1.1s cubic-bezier(.34,1.1,.5,1), filter .9s ease;
 }
 @keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .header-text{
@@ -365,7 +383,11 @@ body::before{
   opacity:0;transform:translateX(300px);
   transition:opacity .9s ease .12s, transform 1.1s cubic-bezier(.34,1.1,.5,1) .12s;
 }
-body.stage-main .header-logo{opacity:1;transform:translateX(0);animation:logoFloat 3.4s ease-in-out .9s infinite;}
+body.stage-main .header-logo{
+  opacity:1;transform:translateX(0);
+  animation:logoFloat 3.4s ease-in-out .9s infinite;
+  filter:drop-shadow(0 8px 26px rgba(0,40,90,.5));
+}
 body.stage-main .header-text{opacity:1;transform:translateX(0);}
 .header-line1{display:flex;align-items:baseline;gap:18px;line-height:1}
 .header-cheers{
@@ -375,15 +397,18 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
   color:var(--vscode-blue);
   text-shadow:3px 3px 0 rgba(0,90,158,.22);
   line-height:1;
+  transition:color .6s ease, text-shadow .6s ease;
 }
 .header-club{
   font-family:var(--font-hand);
   font-size:3.4rem;font-weight:500;
   letter-spacing:.06em;color:var(--ink);line-height:1;
+  transition:color .6s ease, text-shadow .6s ease;
 }
 .header-divider-line{
   height:1px;width:100%;margin:14px 0 10px;
   background:repeating-linear-gradient(to right,var(--line-strong) 0,var(--line-strong) 5px,transparent 5px,transparent 11px);
+  transition:background .6s ease;
 }
 .header-line2{
   font-family:var(--font-sans);
@@ -391,7 +416,9 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
   color:var(--ink-soft);letter-spacing:.36em;
   font-weight:600;text-align:left;
   margin-right:-.36em;
+  transition:color .6s ease, text-shadow .6s ease;
 }
+
 
 .cards-panel{
   display:flex;gap:72px;justify-content:center;align-items:stretch;
@@ -647,7 +674,7 @@ body.stage-main .pixar-card:hover{
 }
 .chaos-dog .main{
   /* ★ 改这一个值即可整体缩放小狗 */
-  font-size:5.2px;
+  font-size:8.4px;
   position:relative;
   width:23.5em;
   height:13em;
@@ -854,51 +881,6 @@ body.stage-main .pixar-card:hover{
 @keyframes sqWave{0%,65%,100%{opacity:.3;transform:scale(.55)}30%{opacity:1;transform:scale(1)}}
 .truth-card .loader-grid-anim{--sq-color:#5BA3C7}
 .dare-card .loader-grid-anim{--sq-color:#E8834A}
-
-/* ===== pl 陀螺 ===== */
-.pl {
-  display: block;
-  width: 90px;
-  height: 90px;
-}
-.pl__arrows,
-.pl__ring-rotate,
-.pl__ring-stroke,
-.pl__tick {
-  animation-duration: 2s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-.pl__arrows {
-  animation-name: arrows42;
-  transform: rotate(45deg);
-  transform-origin: 16px 52px;
-}
-.pl__ring-rotate,
-.pl__ring-stroke { transform-origin: 80px 80px; }
-.pl__ring-rotate { animation-name: ringRotate42; }
-.pl__ring-stroke {
-  animation-name: ringStroke42;
-  transform: rotate(-45deg);
-}
-.pl__tick { animation-name: tick42; }
-.pl__tick:nth-child(2){ animation-delay:-1.75s; }
-.pl__tick:nth-child(3){ animation-delay:-1.5s; }
-.pl__tick:nth-child(4){ animation-delay:-1.25s; }
-.pl__tick:nth-child(5){ animation-delay:-1s; }
-.pl__tick:nth-child(6){ animation-delay:-0.75s; }
-.pl__tick:nth-child(7){ animation-delay:-0.5s; }
-.pl__tick:nth-child(8){ animation-delay:-0.25s; }
-@keyframes arrows42 { from{transform:rotate(45deg)} to{transform:rotate(405deg)} }
-@keyframes ringRotate42 { from{transform:rotate(0)} to{transform:rotate(720deg)} }
-@keyframes ringStroke42 {
-  from,to { stroke-dashoffset:452; transform:rotate(-45deg); }
-  50%    { stroke-dashoffset:169.5; transform:rotate(-180deg); }
-}
-@keyframes tick42 {
-  from,3%,47%,to { stroke-dashoffset:-12; }
-  14%,36% { stroke-dashoffset:0; }
-}
 
 .loader-bars-anim{display:flex;justify-content:center;align-items:center;}
 .loader-bars-anim .bar{width:7px;height:16px;margin:0 2px;border-radius:3px;animation:barWave 2s ease-in-out infinite;}
@@ -1306,7 +1288,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
     <div class="folder-hint" id="folderHint">
       <div class="hint-row">
         <span class="pulse"></span>
-        <span class="hint-cn">点击查看游戏规则</span>
+        <span class="hint-cn">查看游戏规则</span>
       </div>
       <span class="hint-en">Game Rules Inside</span>
     </div>
@@ -1334,10 +1316,13 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       <div class="rule-text">口头选择<strong>「真心话」</strong>或<strong>「大冒险」</strong>后，主持人代为点击。</div>
     </div>
     <div class="rule-item">
-      <div class="rule-text">每次抽取都有 <strong>20% 概率触发 CHAOS 随机牌</strong>，让游戏更有惊喜！</div>
+      <div class="rule-text">每次抽取都有 <strong>20% 概率触发 CHAOS 随机牌</strong>，敬请期待！[doge]</div>
     </div>
   </div>
 </div>
+
+<!-- ★ 天空背景 iframe（Three.js 场景） -->
+<iframe id="skyBg" src="./cartier-sky-background.html" title="Sky Background" aria-hidden="true"></iframe>
 
 <!-- 主内容 -->
 <div class="container">
@@ -1694,6 +1679,7 @@ function startMainStage(){
     folderOverlay.classList.add('hidden');
   }, 350);
 
+  /* ★ stage-main 加的瞬间：标题入场动画 + 天空背景开始淡入 */
   setTimeout(() => {
     document.body.classList.add('stage-main');
   }, 550);
@@ -1782,14 +1768,14 @@ const truthList = [
   "你写过的最套路的请假理由是什么？老师看到后是什么反应？最后请假成功了吗？",
   "你是否有一个坚持了很久的小迷信？比如考前不洗头。",
   "你买过最失败的科技产品是什么？花了多少冤枉钱？",
-  "你手机屏幕使用时间第一的 App 是什么？敢报日均时长吗？现在还是你在追求的吗？如果不是了，是否愿意分享原因呢？",
+  "你手机屏幕使用时间第一的 App 是什么？敢报日均时长吗？",
   "你逃过课吗？逃课去干嘛了？",
   "你买东西最冲动的一次，花了多少钱买了什么？",
   "如果给你一天当社长，你最想在社团推行什么奇怪点子？",
   "学期初咱们社团的周边售卖，你有来吗？如果让你来决定卖哪些新周边，你会选择什么？定价多少？",
   "你做过最『社死』的事情是什么？后来怎么圆的？",
   "你最不能忍受同伴的哪个习惯？建议不要点名哦",
-  "你小时候的梦想是什么？",
+  "你小时候有什么梦想吗？现在还在追求吗？如果不是了，是什么让你放弃的？",
   "如果社团突然获得一笔巨款，你第一个建议买什么？",
   "你最想和谁交换人生一天？在座的也可以。",
   "你收到过最难忘的夸奖是什么？谁夸的？",
@@ -1803,101 +1789,40 @@ const truthList = [
 
 /* 大冒险：现场即可完成，表演/模仿/互动为主，无肢体接触、无离场任务 */
 const dareList = [
-  "模仿一种动物的叫声和动作，让全场猜是什么。",
-  "用新闻联播的语气播报：「本社团今日活动圆满，同学情绪稳定。」",
-  "站起来唱《孤勇者》副歌，要求真情实感。",
-  "表演「手机只剩1%电量时的你」，坚持10秒。",
-  "用文言文说「我饿了，想吃火锅」，情绪要饱满。",
-  "和左边的人对视5秒，然后真诚地夸对方一个优点。",
-  "用最浮夸的电视购物腔，安利你手边的任意物品。",
-  "即兴来一段四句的 rap，主题：今晚的社团活动。",
-  "表演你早上被闹钟叫醒的全过程。",
-  "用三种不同的情绪说「明天要交作业」。",
-  "用三种方言或腔调说「奇思科创社，牛！」。",
-  "假装成现场记者，采访一位同学两个问题。",
-  "表演「Wi-Fi 卡顿的人」，坚持到有人笑场。",
-  "用最温柔的声音说一句最扎心的狠话。",
-  "连续表演「学霸做题」和「学渣做题」各5秒。",
-  "模仿你手机里最常用的一个表情，让全场猜。",
-  "接下来一个问题，你必须用唱歌的方式回答。",
-  "表演「代码终于跑通了」的狂喜，持续5秒。",
-  "模仿打印机卡纸的声音和形态，越像越好。",
-  "走到门口大喊「我是奇思科创社最靓的仔」，然后淡定走回来。",
-  "让右边的人给你一句台词，你用偶像剧腔演出来。",
-  "表演「开黑赢了」和「开黑输了」两种反应，各5秒。",
-  "用身体摆出一个英文字母，让全场猜是哪个。",
-  "接下来一分钟，你说的每句话都必须以「科学研究表明」开头。",
-  "用嘴模仿一段手机铃声或闹钟声，让全场猜是什么。",
-  "和一位同学组队玩「你比划我猜」，题目由主持人出，比如「3D打印机」。",
-  "表演「周日晚上八点想起作业没写」的你。",
-  "大声说出你的手机壁纸是什么，并解释为什么是它。",
-  "用乐评人的口吻点评现场音乐，至少说两句专业术语。",
-  "即兴赋诗一首，主题由左边的人指定，四句以内。",
-  "把「多喝热水」翻译成十种不同的安慰说法。",
-  "重新表演一遍你第一次上台自我介绍的样子。",
-  "和对面的人猜拳，输的人做10个深蹲并大声计数。",
-  "用主持人的腔调宣布「本次大会圆满结束，散会！」，然后自己坐回去。",
-  "表演「网课掉线又重新连上」的全过程。",
-  "和一位同学组成「人形打印机」：你做打字动作，TA 配音，表演10秒。",
-  "用弹幕语气实时解说现场，直到主持人喊停。",
-  "模仿一个动漫角色的经典台词和动作。",
-  "表演「在图书馆突然想笑但必须忍住」，坚持10秒。",
-  "对主持人连续说三句夸奖，每句必须含一个成语。",
-  "表演「刚出厂的机器人学习人类微笑」，切换三种笑法。",
-  "深情朗读：「遇见你，是我今天手气最差的安慰。」对象由主持人指定。",
-  "表演「吃了一口柠檬但强装没事」，坚持5秒。",
-  "打开输入法输入「社团」并连选三个联想词，大声念出结果。",
-  "模仿电脑蓝屏的画面，僵住5秒，然后说「重启中」。",
-  "用手势舞或自由发挥跳10秒舞，背景音乐自己嘴哼。",
-  "表演「你的电脑正在更新，进度卡在99%」，坚持到有人笑。",
-  "表演「考场上笔没水了，向周围人无声求助」的全过程。",
-  "现场找一位同学，你们合唱一句任意儿歌。",
-  "用主持人的语气复述 TA 刚说过的话，但要加上戏精式气泡音。"
+  "模仿家里人平时叫你起床时的样子和话语。",
+  "说出一句你家乡最常出现的口头禅，然后自己翻译一遍。",
+  "试着模仿广播站播音，凭着记忆中的点歌台话术和表达，给现场任意一位同学点歌；记不清的话，可以求助。",
+  "模仿你们班里某位老师的口头禅，并可以和大家简单分享一下这位老师。",
+  "模仿你们班里某位老师上课的样子，并可以和大家简单分享一下这位老师。",
+  "站在台上，把你今天之内，或者来参加全社大会之前那件没做完的事完整演一遍到结束，建议先表演再说是什么事。",
+  "对着全场模仿家长看到你成绩单时的反应。",
+  "由右边同学说一个句子，然后你用动作把这个句子表演出来。",
+  "模仿你们体育老师或者体委上体育课时整队的流程。",
+  "唱一段校歌，独唱不敢的话，可以拉同学一起上。",
+  "金鸡独立 20 秒，由观众帮你计时。",
+  "做一个你自认为最帅或最美的 pose，并保持五秒。",
+  "到后台帮忙按音乐和抽真心话大冒险一轮。",
+  "再拉一个人和你一起上台，背靠背夹着玩偶绕着舞台走一圈，不能掉下来，否则重新做。",
+  "模仿你刷到一段视频笑到前仰后合的样子，坚持五秒。",
+  "模仿头发被静电炸起来、你伸手去压、又炸起来的循环，做三轮。",
+  "模仿踩进水坑、鞋进水之后你走路的姿势，绕舞台走一圈。",
+  "叫另外一位同学与你一起上台，面对面憋笑，谁先破功则需要再抽一条惩罚",
+  "公开跟一位同部门比你小一届或大一届的同学说一句你想说的话——对工作的期待、对明年的愿望都行",
+  "对着天花板做出你认为最夸张的动作，并保持五秒。",
 ];
 
 const chaosCards = [
-  { name: "移花接木", desc: "把你抽到的题目，交给现场另一位同学完成。" },
-  { name: "同舟共济", desc: "在现场找一位同学，与你共同完成这个挑战。" },
+  { name: "移花接木", desc: "你可以选择把你抽到的题目交给现场另一位同学完成。" },
+  { name: "同舟共济", desc: "你可以在现场找一位同学与你共同完成这个挑战。" },
   { name: "偷梁换柱", desc: "把刚才的选择换成另一个，并重抽一次。" },
   { name: "祸不单行", desc: "先把你抽到的挑战做完，完成之后还得再抽一次。" },
   { name: "金蝉脱壳", desc: "本轮安全通过，你可以选择不用完成。" },
-  { name: "祸水东引", desc: "完成后，由你指定下一位被挑战的同学。" }
+  { name: "祸水东引", desc: "完成后，由你指定下一位上来挑战的同学。" }
 ];
 
 /* ==================== 卡片内动画池 ==================== */
 const LOADER_HTML = {
   grid: '<span class="loader-grid-anim"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>',
-  conic: '<svg class="pl" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">' +
-         '<defs><linearGradient id="plGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#000"/><stop offset="100%" stop-color="#fff"/></linearGradient>' +
-         '<mask id="plMask1"><rect x="0" y="0" width="160" height="160" fill="url(#plGrad)"/></mask>' +
-         '<mask id="plMask2"><rect x="28" y="28" width="104" height="104" fill="url(#plGrad)"/></mask></defs>' +
-         '<g><g class="pl__ring-rotate"><circle class="pl__ring-stroke" cx="80" cy="80" r="72" fill="none" stroke="hsl(223,90%,55%)" stroke-width="16" stroke-dasharray="452.39 452.39" stroke-dashoffset="452" stroke-linecap="round" transform="rotate(-45,80,80)"/></g></g>' +
-         '<g mask="url(#plMask1)"><g class="pl__ring-rotate"><circle class="pl__ring-stroke" cx="80" cy="80" r="72" fill="none" stroke="hsl(193,90%,55%)" stroke-width="16" stroke-dasharray="452.39 452.39" stroke-dashoffset="452" stroke-linecap="round" transform="rotate(-45,80,80)"/></g></g>' +
-         '<g><g stroke-width="4" stroke-dasharray="12 12" stroke-dashoffset="12" stroke-linecap="round" transform="translate(80,80)">' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(-135,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(-90,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(-45,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(0,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(45,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(90,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(135,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,10%,90%)" points="0,2 0,14" transform="rotate(180,0,0) translate(0,40)"/></g></g>' +
-         '<g mask="url(#plMask1)"><g stroke-width="4" stroke-dasharray="12 12" stroke-dashoffset="12" stroke-linecap="round" transform="translate(80,80)">' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(-135,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(-90,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(-45,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(0,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(45,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(90,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(135,0,0) translate(0,40)"/>' +
-         '<polyline class="pl__tick" stroke="hsl(223,90%,80%)" points="0,2 0,14" transform="rotate(180,0,0) translate(0,40)"/></g></g>' +
-         '<g><g transform="translate(64,28)"><g class="pl__arrows" transform="rotate(45,16,52)">' +
-         '<path fill="hsl(3,90%,55%)" d="M17.998,1.506l13.892,43.594c.455,1.426-.56,2.899-1.998,2.899H2.108c-1.437,0-2.452-1.473-1.998-2.899L14.002,1.506c.64-2.008,3.356-2.008,3.996,0Z"/>' +
-         '<path fill="hsl(223,10%,90%)" d="M14.009,102.499L.109,58.889c-.453-1.421,.559-2.889,1.991-2.889H29.899c1.433,0,2.444,1.468,1.991,2.889l-13.899,43.61c-.638,2.001-3.345,2.001-3.983,0Z"/></g></g></g>' +
-         '<g mask="url(#plMask2)"><g transform="translate(64,28)"><g class="pl__arrows" transform="rotate(45,16,52)">' +
-         '<path fill="hsl(333,90%,55%)" d="M17.998,1.506l13.892,43.594c.455,1.426-.56,2.899-1.998,2.899H2.108c-1.437,0-2.452-1.473-1.998-2.899L14.002,1.506c.64-2.008,3.356-2.008,3.996,0Z"/>' +
-         '<path fill="hsl(223,90%,80%)" d="M14.009,102.499L.109,58.889c-.453-1.421,.559-2.889,1.991-2.889H29.899c1.433,0,2.444,1.468,1.991,2.889l-13.899,43.61c-.638,2.001-3.345,2.001-3.983,0Z"/></g></g></g>' +
-         '</svg>',
   bars: '<div class="loader-bars-anim">' +
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
@@ -2203,20 +2128,128 @@ audio.addEventListener('loadedmetadata', () => {
   progressTimeTotal.textContent = formatTime(audio.duration);
 });
 
-function parseFileName(filename){
-  const name = filename.replace(/\.[^/.]+$/, '');
-  const sep = name.match(/\s*[-–—]\s*/);
-  if (sep){
-    const parts = name.split(/\s*[-–—]\s*/);
-    if (parts.length >= 2){
-      const artist = parts[0].trim();
-      const title = parts.slice(1).join(' - ').trim();
-      if (artist && title) return { artist, title };
-    }
-  }
-  return { artist: '未知艺术家', title: name };
-}
+/* ========== 文件名 → 歌手/歌名 映射表 ========== */
+/* 笑吐了，不懂算法太麻烦，只好用这个笨方法了，辛苦本地AI了*/
+const TRACK_MAP = {
+  "Always Online - 林俊杰": { artist: "林俊杰", title: "Always Online" },
+  "Apologize - OneRepublic": { artist: "OneRepublic", title: "Apologize" },
+  "AURORA-The Secret Garden": { artist: "AURORA", title: "The Secret Garden" },
+  "Da Capo": { artist: "未知艺术家", title: "Da Capo" },
+  "Daylight - Seredris": { artist: "Seredris", title: "Daylight" },
+  "Dehors - JORDANN": { artist: "JORDANN", title: "Dehors" },
+  "Diary - 相许": { artist: "相许", title: "Diary" },
+  "Empty Love (feat. Kid Princess) - Lulleaux - APLMate.com": { artist: "Lulleaux", title: "Empty Love (feat. Kid Princess)" },
+  "exile": { artist: "未知艺术家", title: "exile" },
+  "G.E.M. 邓紫棋 - 喜欢你": { artist: "G.E.M. 邓紫棋", title: "喜欢你" },
+  "golden hour - JVKE": { artist: "JVKE", title: "golden hour" },
+  "III - Athletics": { artist: "Athletics", title: "III" },
+  "Keep Your Head Up Princess - Anson Seabra": { artist: "Anson Seabra", title: "Keep Your Head Up Princess" },
+  "Komorebi - 田熊理秀": { artist: "田熊理秀", title: "Komorebi" },
+  "Love Song - 方大同": { artist: "方大同", title: "Love Song" },
+  "Love Story": { artist: "未知艺术家", title: "Love Story" },
+  "MOM - 蜡笔小心（灵柯）": { artist: "蜡笔小心（灵柯）", title: "MOM" },
+  "Ozora Crystal - Michita": { artist: "Michita", title: "Ozora Crystal" },
+  "Payphone - Maroon 5,Wiz Khalifa": { artist: "Maroon 5,Wiz Khalifa", title: "Payphone" },
+  "Reach Me - 告白之夜 (纯钢琴)": { artist: "未知艺术家", title: "Reach Me" },
+  "Sacred Play Secret Place - Matryoshka": { artist: "Matryoshka", title: "Sacred Play Secret Place" },
+  "Shadow of the Sun - Max Elto": { artist: "Max Elto", title: "Shadow of the Sun" },
+  "Something Just Like This - Something Just Like This": { artist: "未知艺术家", title: "Something Just Like This" },
+  "Stitches - Shawn Mendes": { artist: "Shawn Mendes", title: "Stitches" },
+  "Take My Hand - DAISHI DANCE,Cécile Corbel": { artist: "DAISHI DANCE,Cécile Corbel", title: "Take My Hand" },
+  "The truth that you leave - Pianoboy高至豪": { artist: "Pianoboy高至豪", title: "The truth that you leave" },
+  "Xun - 溯 (Sunian手碟空灵版)(纯音乐)": { artist: "未知艺术家", title: "溯" },
+  "【FREE】lucky - Salder4cash": { artist: "Salder4cash", title: "lucky" },
+  "一样的月光": { artist: "未知艺术家", title: "一样的月光" },
+  "一点 - Muyoi,Pezzi": { artist: "Muyoi,Pezzi", title: "一点" },
+  "一程山路 - 毛不易": { artist: "毛不易", title: "一程山路" },
+  "万蝶振翅(1)": { artist: "未知艺术家", title: "万蝶振翅" },
+  "下一个天亮": { artist: "未知艺术家", title: "下一个天亮" },
+  "不将就 - 李荣浩": { artist: "李荣浩", title: "不将就" },
+  "云汐 - 身骑白马": { artist: "云汐", title: "身骑白马" },
+  "你星Official - 心似烟火": { artist: "你星Official", title: "心似烟火" },
+  "侧脸 - 于果": { artist: "于果", title: "侧脸" },
+  "倒数 - G.E.M.邓紫棋": { artist: "G.E.M.邓紫棋", title: "倒数" },
+  "关键词-林俊杰": { artist: "林俊杰", title: "关键词" },
+  "再见 (Live Piano Session II) - G.E.M.邓紫棋": { artist: "G.E.M.邓紫棋", title: "再见" },
+  "凄美地 - 郭顶": { artist: "郭顶", title: "凄美地" },
+  "半岛铁盒-周杰伦": { artist: "周杰伦", title: "半岛铁盒" },
+  "反方向的钟-周杰伦": { artist: "周杰伦", title: "反方向的钟" },
+  "句号 - G.E.M.邓紫棋": { artist: "G.E.M.邓紫棋", title: "句号" },
+  "可惜没如果 - 林俊杰": { artist: "林俊杰", title: "可惜没如果" },
+  "吉星出租 - 暮色回响": { artist: "暮色回响", title: "吉星出租" },
+  "周杰伦 - 晴天": { artist: "周杰伦", title: "晴天" },
+  "周杰伦 - 最长的电影": { artist: "周杰伦", title: "最长的电影" },
+  "周杰伦-兰亭序": { artist: "周杰伦", title: "兰亭序" },
+  "周杰伦-半岛铁盒": { artist: "周杰伦", title: "半岛铁盒" },
+  "周杰伦-反方向的钟": { artist: "周杰伦", title: "反方向的钟" },
+  "周杰伦-手写的从前": { artist: "周杰伦", title: "手写的从前" },
+  "周杰伦-稻香": { artist: "周杰伦", title: "稻香" },
+  "周杰伦-蒲公英的约定": { artist: "周杰伦", title: "蒲公英的约定" },
+  "周深 - 起风了": { artist: "周深", title: "起风了" },
+  "唯一 - G.E.M.邓紫棋": { artist: "G.E.M.邓紫棋", title: "唯一" },
+  "坂本龍一 - Energy Flow": { artist: "坂本龍一", title: "Energy Flow" },
+  "坂本龍一 - Merry Christmas Mr. Lawrence": { artist: "坂本龍一", title: "Merry Christmas Mr. Lawrence" },
+  "城南花已开 - 三亩地": { artist: "三亩地", title: "城南花已开" },
+  "多远都要在一起 - G.E.M.邓紫棋": { artist: "G.E.M.邓紫棋", title: "多远都要在一起" },
+  "夜空中最亮的星": { artist: "未知艺术家", title: "夜空中最亮的星" },
+  "天天": { artist: "未知艺术家", title: "天天" },
+  "富士山下 - 陈奕迅": { artist: "陈奕迅", title: "富士山下" },
+  "小城大爱": { artist: "未知艺术家", title: "小城大爱" },
+  "平凡之路 - 朴树": { artist: "朴树", title: "平凡之路" },
+  "年少有为 - 李荣浩": { artist: "李荣浩", title: "年少有为" },
+  "当你 - 王心凌": { artist: "王心凌", title: "当你" },
+  "心墙 - 林俊杰": { artist: "林俊杰", title: "心墙" },
+  "情歌 - 梁静茹": { artist: "梁静茹", title: "情歌" },
+  "惊鸿一梦 - 凌晨一点的莱茵猫,心语馆": { artist: "凌晨一点的莱茵猫,心语馆", title: "惊鸿一梦" },
+  "愿与愁 - 林俊杰": { artist: "林俊杰", title: "愿与愁" },
+  "我只能离开 - 颜人中": { artist: "颜人中", title: "我只能离开" },
+  "我怀念的 - 孙燕姿": { artist: "孙燕姿", title: "我怀念的" },
+  "戒烟 - 李荣浩": { artist: "李荣浩", title: "戒烟" },
+  "找自己 - 陶喆": { artist: "陶喆", title: "找自己" },
+  "新地球 - 林俊杰": { artist: "林俊杰", title: "新地球" },
+  "星球狂欢": { artist: "未知艺术家", title: "星球狂欢" },
+  "春娇与志明-街道办GDC&欧阳耀莹": { artist: "街道办GDC&欧阳耀莹", title: "春娇与志明" },
+  "最初的记忆": { artist: "未知艺术家", title: "最初的记忆" },
+  "有些 - 颜人中": { artist: "颜人中", title: "有些" },
+  "果冻儿. - 精卫 (关中王进行曲)": { artist: "果冻儿", title: "精卫" },
+  "梦巷 - 时间煮雨 (Remix)": { artist: "梦巷", title: "时间煮雨" },
+  "水星记 - 郭顶": { artist: "郭顶", title: "水星记" },
+  "水龙吟 - 关大洲(1)": { artist: "关大洲", title: "水龙吟" },
+  "江南 - 林俊杰": { artist: "林俊杰", title: "江南" },
+  "泡沫 - G.E.M.邓紫棋": { artist: "G.E.M.邓紫棋", title: "泡沫" },
+  "浮光 (The ..._lan(1)": { artist: "未知艺术家", title: "浮光" },
+  "溯 (Reverse) - CORSAK胡梦周,马吟吟": { artist: "CORSAK胡梦周,马吟吟", title: "溯" },
+  "爱在西元前 - 周杰伦": { artist: "周杰伦", title: "爱在西元前" },
+  "爱情讯息 - 汪珂楠": { artist: "汪珂楠", title: "爱情讯息" },
+  "爱我还是他": { artist: "未知艺术家", title: "爱我还是他" },
+  "爱错": { artist: "未知艺术家", title: "爱错" },
+  "特别的人 - 方大同": { artist: "方大同", title: "特别的人" },
+  "盛哲 - 在你的身边": { artist: "盛哲", title: "在你的身边" },
+  "紫荆花盛开 - 李荣浩,梁咏琪": { artist: "李荣浩,梁咏琪", title: "紫荆花盛开" },
+  "红色高跟鞋(0.88x) - swagger": { artist: "swagger", title: "红色高跟鞋" },
+  "罗生门（Follow） - 梨冻紧,Wiz_H张子豪": { artist: "梨冻紧,Wiz_H张子豪", title: "罗生门（Follow）" },
+  "背对背拥抱 - 林俊杰": { artist: "林俊杰", title: "背对背拥抱" },
+  "舍得": { artist: "未知艺术家", title: "舍得" },
+  "茉莉雨": { artist: "未知艺术家", title: "茉莉雨" },
+  "莫愁乡": { artist: "未知艺术家", title: "莫愁乡" },
+  "蒲公英的约定-周杰伦": { artist: "周杰伦", title: "蒲公英的约定" },
+  "裹着心的光 - Natsu团长": { artist: "Natsu团长", title: "裹着心的光" },
+  "身骑白马": { artist: "未知艺术家", title: "身骑白马" },
+  "辞九门回忆": { artist: "未知艺术家", title: "辞九门回忆" },
+  "那些你很冒险的梦": { artist: "未知艺术家", title: "那些你很冒险的梦" },
+  "釉色(0.8倍)": { artist: "未知艺术家", title: "釉色" },
+  "雨爱": { artist: "未知艺术家", title: "雨爱" },
+  "韩红、薛之谦 - 小尖尖": { artist: "韩红、薛之谦", title: "小尖尖" },
+  "飞云之下 - 韩红,林俊杰": { artist: "韩红,林俊杰", title: "飞云之下" },
+  "魏小涵 - 秦时明月-飞雪玉花": { artist: "魏小涵", title: "秦时明月-飞雪玉花" },
+  "麦恩莉": { artist: "未知艺术家", title: "麦恩莉" }
+};
 
+function resolveTrack(filename){
+  const base = filename.replace(/\.[^/.]+$/, '');
+  if (TRACK_MAP[base]) return TRACK_MAP[base];
+  return { artist: '未知艺术家', title: base };
+}
 function updateTrackInfo(){
   if (playlist.length === 0){
     trackName.textContent = '未选择曲目';
@@ -2272,7 +2305,7 @@ fileInput.addEventListener('change', (e) => {
   let added = 0;
   files.forEach(f => {
     if (f.type.startsWith('audio/')){
-      const parsed = parseFileName(f.name);
+      const parsed = resolveTrack(f.name);
       playlist.push({
         title: parsed.title,
         artist: parsed.artist,
