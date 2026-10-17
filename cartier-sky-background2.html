@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>晨光奶蓝天 · 背景 v2</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  /* 与 shader 同一套配色，场景就绪前不闪白 */
+  body { background: linear-gradient(180deg, #8AB6D6 0%, #B5D2DF 45%, #DDEBE2 78%, #F7F2E3 100%); }
+  canvas { display: block; }
+</style>
+<!-- UMD 版 Three.js：经典 script 标签，file:// 双击打开也能跑，离线可用 -->
+<script src="./three.min.js"></script>
+</head>
+<body>
+<script>
+const THREE = window.THREE;
+
+/* ============================================================
+   晨光奶蓝天 · cartier-sky-background2
+   设计目标：简约清新、退居卡片之后的背景。
+   - 天空：四段色阶（天蓝→晨光奶油），左下角一抹暖晨光
+   - 云：程序生成的柔和有机形（软边泡状叠加 + 冷调底影），
+     彻底避开 v1 的图标贴纸感
+   - 构图：远 / 中 / 近三层，上部留白给标题，
+     卡片正后方保持干净（继承 v1 的面板避让机制）
+   - 质感：静态纸面颗粒（印刷感），消除大面积渐变的数字味
+   - 动效：云极慢漂移 + 轻微鼠标视差，后台自动停渲染
+   ============================================================ */
+
+/* ---------------------------------------------------------------- 工具 */
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* ------------------------------------------------- 柔和有机云贴图 */
+
+// 不用任何现成图标路径。整朵云由若干个"软边泡"叠加而成：
+// 每个泡是从实心白核心渐隐到透明的径向渐变，边缘没有硬轮廓，
+// 这是去掉贴纸感的关键。叠完后按云的包围盒压一层
+// 白→冷蓝的垂直明暗，让云有体积但依然是"平面印刷"的体积。
+function makeCloudTexture(seed) {
+  const S = 512;
+  const rnd = mulberry32(seed);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = S;
+  const ctx = canvas.getContext('2d');
+
+  // 云沿水平轴展开，中段的泡最大最高，两端收小——自然云的剪影规律
+  const n = 6 + Math.floor(rnd() * 3);          // 6~8 个泡
+  const span = S * (0.62 + rnd() * 0.10);       // 云的水平跨度
+  const baseY = S * 0.60;                       // 云底基准线
+  let minY = S, maxY = 0, minX = S, maxX = 0;
+
+  const puff = (px, py, pr) => {
+    const g = ctx.createRadialGradient(px, py, pr * 0.18, px, py, pr);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.72, 'rgba(255,255,255,0.96)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(px - pr, py - pr, pr * 2, pr * 2);
+    minY = Math.min(minY, py - pr); maxY = Math.max(maxY, py + pr);
+    minX = Math.min(minX, px - pr); maxX = Math.max(maxX, px + pr);
+  };
+
+  // 底部一条宽而扁的软泡当"云身"，泡群坐在它上面
+  puff(S / 2, baseY, span * 0.30);
+
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    const env = Math.pow(Math.sin(Math.PI * t), 0.8);   // 中间鼓两端收
+    const px = S / 2 + lerp(-span / 2, span / 2, t) + (rnd() - 0.5) * span * 0.05;
+    const py = baseY - env * S * (0.13 + rnd() * 0.06) + (rnd() - 0.5) * S * 0.02;
+    const pr = S * (0.075 + env * 0.085) * (0.92 + rnd() * 0.16);
+    puff(px, py, pr);
+  }
+
+  // 明暗：顶部亮白 → 底部冷蓝影，按云的真实包围盒铺
+  const grad = ctx.createLinearGradient(0, minY, 0, maxY);
+  grad.addColorStop(0.00, '#ffffff');
+  grad.addColorStop(0.52, '#fdfefe');
+  grad.addColorStop(0.76, '#e9f1f7');
+  grad.addColorStop(1.00, '#c7d9e8');
+  ctx.globalCompositeOperation = 'source-atop';
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, S, S);
+  ctx.globalCompositeOperation = 'source-over';
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.encoding = THREE.sRGBEncoding;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
+  tex.userAspect = (maxX - minX) / (maxY - minY);
+  return tex;
+}
+
+/* --------------------------------------------------------- 渲染器 */
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(0, 0, 12);
+
+/* ------------------------------------------------------------- 天空 */
+
+const skyUniforms = {
+  uTime:  { value: 0 },
+  uAspect:{ value: innerWidth / innerHeight },
+};
+
+const sky = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1),
+  new THREE.ShaderMaterial({
+    uniforms: skyUniforms,
+    depthWrite: false,
+    vertexShader: /* glsl */`
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */`
+      uniform float uTime;
+      uniform float uAspect;
+      varying vec2 vUv;
+
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      }
+      float noise(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        vec2 u = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+                   mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+      }
+      float fbm(vec2 p) {
+        float v = 0.0, a = 0.5;
+        mat2 m = mat2(1.62, 1.18, -1.18, 1.62);
+        for (int i = 0; i < 4; i++) { v += a * noise(p); p = m * p; a *= 0.5; }
+        return v;
+      }
+
+      void main() {
+        // 方案 C：晨光薄荷。四段色阶，比两段渐变更润
+        vec3 top = vec3(0.541, 0.714, 0.839);   // #8AB6D6
+        vec3 mid = vec3(0.710, 0.824, 0.875);   // #B5D2DF
+        vec3 low = vec3(0.867, 0.922, 0.886);   // #DDEBE2
+        vec3 hor = vec3(0.969, 0.949, 0.890);   // #F7F2E3
+
+        float t = uTime * 0.004;
+        vec3 col = mix(hor, low, smoothstep(0.00, 0.22, vUv.y));
+        col = mix(col, mid, smoothstep(0.30, 0.62, vUv.y));
+        col = mix(col, top, smoothstep(0.58, 1.00, vUv.y));
+
+        // 左下角一抹暖晨光，很淡，只负责"太阳在画面外左侧"的心理暗示
+        vec2 gp = vec2(0.16, 0.06);
+        float gd = distance(vec2(vUv.x * uAspect, vUv.y), vec2(gp.x * uAspect, gp.y));
+        col = mix(col, vec3(0.965, 0.910, 0.780), exp(-gd * 2.1) * 0.30);
+
+        // 高空一层极淡的流动薄雾，让大片蓝色不死板
+        vec2 p = vec2(vUv.x * uAspect, vUv.y) * 2.2;
+        float haze = fbm(p + vec2(t, t * 0.35));
+        col = mix(col, vec3(1.0, 0.99, 0.96), smoothstep(0.52, 0.98, haze) * 0.08);
+
+        // 静态纸面颗粒：坐标不随时间变，是"印上去"的颗粒而不是噪点闪烁
+        float grain = hash(floor(gl_FragCoord.xy)) - 0.5;
+        col += grain * 0.016;
+
+        // 抖动，消除大面积渐变的色带
+        col += (hash(vUv * 1024.0) - 0.5) * 0.006;
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `,
+  })
+);
+sky.position.z = -60;
+sky.renderOrder = -1;
+scene.add(sky);
+
+/* ------------------------------------------------------------- 云 */
+
+const cloudTex = [
+  makeCloudTexture(11), makeCloudTexture(29), makeCloudTexture(47),
+  makeCloudTexture(83), makeCloudTexture(127),
+];
+const cloudGeo = new THREE.PlaneGeometry(1, 1);
+
+const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(45) / 2);
+
+// 三层景深。层内：同一 cross（飘过整屏的秒数）+ 初始均匀铺位，
+// 层内间距永远均匀。层间：越近的云越大、越不透明、飘得越快，
+// 形成自然的视差纵深。上部留白给标题区，卡片正后方保持干净。
+const LAYERS = [
+  { cross: 104, clouds: [
+    { z: -42, h: 2.9, y:  8.5, tex: 0, op: 0.50 },
+    { z: -40, h: 3.4, y:  5.0, tex: 1, op: 0.58 },
+    { z: -38, h: 2.6, y: 10.5, tex: 2, op: 0.46 },
+    { z: -36, h: 3.1, y:  2.6, tex: 3, op: 0.62 },
+  ]},
+  { cross: 82, clouds: [
+    { z: -26, h: 6.4, y:  6.2, tex: 4, op: 0.78 },
+    { z: -24, h: 8.2, y: -2.6, tex: 1, op: 0.86 },
+    { z: -22, h: 5.6, y:  3.0, tex: 2, op: 0.74 },
+  ]},
+  { cross: 64, clouds: [
+    { z: -14, h: 11.0, y: -4.2, tex: 0, op: 0.95, below: true },
+    { z: -12, h:  8.8, y:  5.4, tex: 3, op: 0.92 },
+  ]},
+];
+
+const clouds = [];
+for (const layer of LAYERS) {
+  for (const c of layer.clouds) {
+    const w = c.h * cloudTex[c.tex].userAspect;
+    const mesh = new THREE.Mesh(cloudGeo, new THREE.MeshBasicMaterial({
+      map: cloudTex[c.tex],
+      transparent: true,
+      opacity: c.op,
+      depthWrite: false,
+    }));
+    mesh.scale.set(w, c.h, 1);
+    mesh.position.set(0, c.y, c.z);
+    scene.add(mesh);
+    clouds.push({ mesh, layer, w, halfW: 0, wrap: 0, speed: 0, placed: false,
+                  bob: 0.24 + Math.random() * 0.30,
+                  period: 9 + Math.random() * 4,
+                  phase: Math.random() * Math.PI * 2, ...c });
+  }
+}
+// 层内初始铺位序号
+for (const layer of LAYERS) {
+  layer.clouds.forEach((c, i) => { c.slot = i; c.count = layer.clouds.length; });
+}
+
+// 每朵云露出面板上缘的高度（占自身半高），参差但不排成整齐横排
+const PEEK = [0.35, 0.05, 0.5, 0.2, 0.65, 0.3, 0.42, 0.15, 0.55];
+
+function getPanelRect() {
+  try {
+    const panel = window.parent.document.querySelector('.cards-panel');
+    if (panel) return panel.getBoundingClientRect();
+  } catch (e) { /* file:// 跨源访问被拦，走兜底 */ }
+  // 兜底：按主页面布局近似——卡片面板占中下部，云在上面缘参差露头
+  return { top: innerHeight * 0.42, bottom: innerHeight,
+           width: innerWidth, height: innerHeight * 0.58 };
+}
+
+function layoutClouds() {
+  const pr = getPanelRect();
+
+  clouds.forEach((c, idx) => {
+    const dist = camera.position.z - c.z;
+    const halfH = dist * tanHalfFov;
+    const visibleHalf = halfH * camera.aspect;
+    c.halfW = visibleHalf * 1.4;
+    c.wrap = c.halfW * 2;
+    c.speed = (visibleHalf * 2) / c.layer.cross;
+
+    if (pr) {
+      const toWorld = (sy) => (1 - 2 * sy / innerHeight) * halfH;
+      const bandTop = toWorld(pr.top), bandBottom = toWorld(pr.bottom);
+      const halfCloud = c.h / 2;
+      const blocked = (c.y + c.bob + halfCloud > bandBottom) &&
+                      (c.y - c.bob - halfCloud < bandTop);
+      if (blocked) {
+        if (c.below || bandTop + halfCloud * 1.3 >= halfH) {
+          c.y = bandBottom - halfCloud * 0.85;          // 沉到面板下面
+        } else {
+          c.y = bandTop + halfCloud * PEEK[idx % PEEK.length]; // 压到上缘露一点
+        }
+      }
+    }
+
+    if (!c.placed) {
+      // 层内按槽位均匀铺满整屏
+      c.mesh.position.x = ((c.slot + 0.5) / c.count * 2 - 1) * visibleHalf;
+      c.mesh.position.y = c.y;
+      c.placed = true;
+    } else {
+      c.mesh.position.x = ((c.mesh.position.x + c.halfW) % c.wrap + c.wrap) % c.wrap - c.halfW;
+    }
+  });
+}
+
+/* ---------------------------------------------------- 交互与自适应 */
+
+const pointer = { x: 0, y: 0 };
+const smooth  = { x: 0, y: 0 };
+addEventListener('pointermove', (e) => {
+  pointer.x = (e.clientX / innerWidth - 0.5) * 2;
+  pointer.y = (e.clientY / innerHeight - 0.5) * 2;
+});
+
+function resize() {
+  const aspect = innerWidth / innerHeight;
+  camera.aspect = aspect;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  skyUniforms.uAspect.value = aspect;
+
+  const h = 2 * tanHalfFov * Math.abs(camera.position.z - sky.position.z);
+  sky.scale.set(h * aspect * 1.2, h * 1.2, 1);
+  layoutClouds();
+}
+addEventListener('resize', resize);
+resize();
+
+/* -------------------------------------------------------- 主循环 */
+
+const clock = new THREE.Clock();
+let elapsed = 0;
+
+function tick() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  elapsed += dt;
+
+  for (const c of clouds) {
+    c.mesh.position.x += c.speed * dt;
+    if (c.mesh.position.x > c.halfW) c.mesh.position.x -= c.wrap;
+    c.mesh.position.y = c.y + Math.sin(elapsed * (Math.PI * 2 / c.period) + c.phase) * c.bob;
+  }
+
+  // 极慢自摆 + 一点点跟随鼠标，量刻意压小：是"活"，不是"动"
+  const swayX = Math.sin(elapsed * 0.05) * 0.32 + pointer.x * 0.42;
+  const swayY = Math.cos(elapsed * 0.041) * 0.18 - pointer.y * 0.28;
+  smooth.x += (swayX - smooth.x) * 0.02;
+  smooth.y += (swayY - smooth.y) * 0.02;
+  camera.position.x = smooth.x;
+  camera.position.y = smooth.y;
+  camera.lookAt(0, 0, -20);
+
+  skyUniforms.uTime.value = elapsed;
+  renderer.render(scene, camera);
+}
+renderer.setAnimationLoop(tick);
+
+// 切到后台时停掉渲染，回来继续
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    renderer.setAnimationLoop(null);
+  } else {
+    clock.getDelta();
+    renderer.setAnimationLoop(tick);
+  }
+});
+</script>
+</body>
+</html>

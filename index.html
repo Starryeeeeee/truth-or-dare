@@ -10,6 +10,17 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="./subset/result.css">
 <link rel="stylesheet" href="./subset-body/result.css">
+
+<!-- ============================================================
+     ★ 统一动画引擎：GSAP 3.13+（含全部免费插件）
+     Core + Flip（布局连续性）+ ScrollTrigger（滚动联动）
+     如 CDN 不可达，脚本会自动降级为 CSS 过渡（见脚本末尾的守卫）
+     ============================================================ -->
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+
 <style>
 /* ==================== 全局变量 ==================== */
 :root{
@@ -27,7 +38,6 @@
   --dare-dark:#C26832;
   --gold:#E8B24E;
   --gold-dark:#B8853A;
-  /* CHAOS：莫奈夕阳橙黄 */
   --chaos:#E8A44E;
   --chaos-dark:#C4862F;
   --vscode-blue:#007ACC;
@@ -57,9 +67,11 @@ body::before{
   transition:opacity .9s ease;
 }
 body.stage-main::before{opacity:0;}
+/* ★ 修复：天空 iframe 加载失败时保持背景渐变可见 */
+body.stage-main.sky-failed::before{opacity:1;}
 
 /* ============================================================
-   ★ 天空背景 iframe（Three.js 场景）
+   ★ 天空背景 iframe
    ============================================================ */
 #skyBg{
   position:fixed;inset:0;
@@ -170,7 +182,7 @@ body.stage-main #skyBg{opacity:1;}
 }
 
 /* ============================================================
-   二、文件夹遮罩（深暖色系信封）
+   二、文件夹遮罩
    ============================================================ */
 #folderOverlay{
   position:fixed;inset:0;z-index:9998;
@@ -178,6 +190,9 @@ body.stage-main #skyBg{opacity:1;}
   background:radial-gradient(circle at 50% 40%, #FFFDF8 0%, #FBF7F0 55%, #F3EBDC 100%);
   opacity:0;pointer-events:none;
   transition:opacity .8s ease;
+  /* ★ 光学平衡：信封上方卡片探出、下方有提示文字，视觉重心偏上，
+     padding-top 在 flex 居中下使整体下移约 40px（半量），拉近上下间距 */
+  padding-top:80px;
 }
 #folderOverlay.show{opacity:1;pointer-events:auto;}
 #folderOverlay.hidden{opacity:0;pointer-events:none;}
@@ -202,7 +217,6 @@ body.stage-main #skyBg{opacity:1;}
 #folderOverlay.show .intro-folder-scale{
   transform:scale(var(--folder-scale));
 }
-/* 信封整体尺寸随视口缩放：默认面向投影/大屏 */
 @media (max-height:860px){:root{--folder-scale:1.4}}
 @media (max-height:720px){:root{--folder-scale:1.18}}
 @media (max-height:520px){:root{--folder-scale:.9}}
@@ -242,7 +256,6 @@ body.stage-main #skyBg{opacity:1;}
   transition:transform 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.1);
 }
 .folder:hover .flap{transform:translate(-50%,-50%) rotateX(-45deg);}
-
 .flap-blur{
   position:absolute;inset:0;
   backdrop-filter:blur(6px);
@@ -282,7 +295,7 @@ body.stage-main #skyBg{opacity:1;}
 }
 
 /* ============================================================
-   三、信纸卡片（极简排版 · 已放大）
+   三、信纸卡片
    ============================================================ */
 .intro-letter{
   position:fixed;left:50%;top:50%;
@@ -305,6 +318,13 @@ body.stage-main #skyBg{opacity:1;}
 }
 .intro-letter.show{transform:translate(-50%,-50%) scale(1) translateY(0);opacity:1;pointer-events:auto;}
 .intro-letter.exit{transform:translate(-50%, 60vh) scale(.85);opacity:0;pointer-events:none;}
+/* 规则文字逐条淡入（"字出来"动画，纯 CSS，不触碰规则页 transform） */
+.intro-letter.show .rule-item{animation:ruleFade .5s cubic-bezier(.16,1,.3,1) both;}
+.intro-letter.show .rule-item:nth-child(1){animation-delay:.4s;}
+.intro-letter.show .rule-item:nth-child(2){animation-delay:.5s;}
+.intro-letter.show .rule-item:nth-child(3){animation-delay:.6s;}
+.intro-letter.show .rule-item:nth-child(4){animation-delay:.7s;}
+@keyframes ruleFade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 .letter-head{display:flex;align-items:center;gap:24px;margin-bottom:38px;}
 .letter-head-gif{
@@ -326,7 +346,6 @@ body.stage-main #skyBg{opacity:1;}
   letter-spacing:.28em;text-transform:uppercase;
   margin-top:8px;
 }
-
 .rule-list{
   display:flex;flex-direction:column;
   gap:30px;
@@ -352,7 +371,7 @@ body.stage-main #skyBg{opacity:1;}
 .rule-text strong{color:var(--dare-dark);font-weight:700;}
 
 /* ============================================================
-   四、主内容（固定满屏）
+   四、主内容
    ============================================================ */
 .container{
   max-width:1140px;margin:0 auto;position:relative;z-index:1;
@@ -405,20 +424,16 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
   letter-spacing:.06em;color:var(--ink);line-height:1;
   transition:color .6s ease, text-shadow .6s ease;
 }
-.header-divider-line{
-  height:1px;width:100%;margin:14px 0 10px;
-  background:repeating-linear-gradient(to right,var(--line-strong) 0,var(--line-strong) 5px,transparent 5px,transparent 11px);
-  transition:background .6s ease;
-}
+/* ★ 已移除 header-divider-line：主副标题直接相邻，用 margin-top 控制呼吸位 */
 .header-line2{
   font-family:var(--font-sans);
-  font-size:21px;
+  font-size:23px;
   color:var(--ink-soft);letter-spacing:.36em;
   font-weight:600;text-align:left;
+  margin-top:14px;
   margin-right:-.36em;
   transition:color .6s ease, text-shadow .6s ease;
 }
-
 
 .cards-panel{
   display:flex;gap:72px;justify-content:center;align-items:stretch;
@@ -445,20 +460,36 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
     0.55em 0.55em 0 var(--ui-dark),
     0.85em 0.85em 0 #1a1a18;
   display:flex;flex-direction:column;
+  /* 默认 transition：hover 用 */
   transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s cubic-bezier(0.34,1.56,0.64,1);
   font-family:'Inter','PingFang SC','Microsoft YaHei',sans-serif;
   opacity:0;transform:translateY(140px);
 }
-body.stage-main .truth-card{
-  transition:opacity 1s ease .5s, transform 1.1s cubic-bezier(.34,1.1,.5,1) .5s, box-shadow 0.25s;
-  opacity:1;transform:translateY(0);
+
+/* ★ 修复：GSAP 就绪 + 入场前：卡片强制隐藏 + 禁用 transition（防止与 GSAP 打架） */
+html.gsap-ready:not(.stage-entered) .pixar-card{
+  opacity:0;
+  transform:translateY(140px);
+  transition:none !important;
 }
+
+/* 入场完成（GSAP 或无 GSAP 都通过 body.stage-main 显示） */
+body.stage-main .truth-card,
 body.stage-main .dare-card{
-  transition:opacity 1s ease .65s, transform 1.1s cubic-bezier(.34,1.1,.5,1) .65s, box-shadow 0.25s;
-  opacity:1;transform:translateY(0);
+  opacity:1;
+  transform:translateY(0);
 }
+/* 无 GSAP 降级：入场用长 transition */
+html:not(.gsap-ready) body.stage-main .truth-card{
+  transition:opacity 1s ease .5s, transform 1.1s cubic-bezier(.34,1.1,.5,1) .5s;
+}
+html:not(.gsap-ready) body.stage-main .dare-card{
+  transition:opacity 1s ease .65s, transform 1.1s cubic-bezier(.34,1.1,.5,1) .65s;
+}
+
+/* ★ 修复：卡片 hover：上浮 + 阴影变长，无旋转 */
 body.stage-main .pixar-card:hover{
-  transform:translateY(-0.5em) rotate(-1.5deg);
+  transform:translateY(-0.5em);
   box-shadow:
     0.75em 0.75em 0 var(--ui-dark),
     1.05em 1.05em 0 #1a1a18;
@@ -567,9 +598,7 @@ body.stage-main .pixar-card:hover{
   box-shadow:0.4em 0.4em 0 var(--ui-dark), 0.65em 0.65em 0 #1a1a18;
   transition:transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s;
 }
-.truth-card .draw-button{
-  background:var(--ui-blue);
-}
+.truth-card .draw-button{background:var(--ui-blue);}
 .draw-button:hover{filter:brightness(1.05);}
 .truth-card .draw-button:active{transform:translate(var(--button-press-depth),var(--button-press-depth));box-shadow:var(--button-press-depth) var(--button-press-depth) 0 var(--ui-dark);}
 .dare-card .draw-button:active{transform:translate(var(--button-press-depth),var(--button-press-depth));box-shadow:var(--button-press-depth) var(--button-press-depth) 0 var(--ui-dark);}
@@ -577,15 +606,19 @@ body.stage-main .pixar-card:hover{
 .draw-button .btn-icon{font-size:1.05em;line-height:1;}
 
 /* ============================================================
-   CHAOS 弹窗（莫奈夕阳橙黄 · 深阴影）
+   CHAOS 弹窗
    ============================================================ */
 .chaos-overlay{
   position:fixed;inset:0;background:rgba(43,42,39,.72);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   display:none;align-items:center;justify-content:center;
-  z-index:1000;padding:24px;animation:chaosFade .25s ease;
+  z-index:1000;padding:24px;
 }
 .chaos-overlay.active{display:flex}
+/* ★ 修复：CSS 淡入仅在无 GSAP 时启用。有 GSAP 时 opacity 由 JS 独占写权，
+   否则 CSS 动画（优先级高于内联样式）结束瞬间会交回 GSAP 尚未写完的值，
+   造成 1.0→0.83→1.0 的跳变闪现 */
+html:not(.gsap-ready) .chaos-overlay.active{animation:chaosFade .3s ease}
 @keyframes chaosFade{from{opacity:0}to{opacity:1}}
 
 .chaos-box{
@@ -598,7 +631,8 @@ body.stage-main .pixar-card:hover{
     0.55em 0.55em 0 var(--ui-dark),
     0.9em 0.9em 0 #1a1a18;
   padding:36px 36px 30px;position:relative;
-  animation:chaosPop .55s var(--ease-spring);
+  /* ★ 修复：入场动画统一交给 CSS，GSAP 不再动 box */
+  animation:chaosPop .85s var(--ease-spring);
   overflow:visible;
 }
 @keyframes chaosPop{
@@ -610,11 +644,10 @@ body.stage-main .pixar-card:hover{
 .chaos-header{position:relative;padding-left:58px;margin-bottom:22px;z-index:2;}
 .chaos-quote{position:absolute;left:0;top:-6px;width:44px;height:44px;color:var(--chaos);opacity:.92;}
 .chaos-title-row{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;}
-.chaos-but{font-family:var(--font-hand);font-size:3.2rem;font-weight:600;letter-spacing:.06em;color:var(--chaos);line-height:1;}
+/* ★ CHAOS 现在是唯一主标题：字号对齐原 But，字距收窄，实色 */
 .chaos-word{
-  font-family:var(--font-hand);font-size:1.8rem;font-weight:500;
-  letter-spacing:.45em;color:var(--chaos);opacity:.82;line-height:1;
-  position:relative;top:.15em;padding-left:.45em;
+  font-family:var(--font-hand);font-size:3.2rem;font-weight:600;
+  letter-spacing:.16em;color:var(--chaos);line-height:1;
 }
 .chaos-divider{
   width:100%;height:2px;margin:0 0 22px 0;
@@ -647,33 +680,30 @@ body.stage-main .pixar-card:hover{
   background:var(--chaos);color:#fff;
   font-family:var(--font-hand);font-size:17px;font-weight:600;
   letter-spacing:.22em;cursor:pointer;
+  /* 硬阴影全程固定：hover 只抬按钮、不拉伸阴影，才有"浮起"的景深感 */
   box-shadow:5px 5px 0 var(--ui-dark), 8px 8px 0 #1a1a18;
-  transition:transform .15s, box-shadow .15s, filter .15s;
+  transition:transform .18s var(--ease-spring), filter .15s ease;
 }
 .chaos-close .btn-icon{font-family:"Font Awesome 6 Free", "Font Awesome 6 Brands" !important;font-size:14px;letter-spacing:0;}
 .chaos-close:hover{
-  transform:translate(-2px,-2px);
-  box-shadow:7px 7px 0 var(--ui-dark), 10px 10px 0 #1a1a18;
-  filter:brightness(1.05);
+  transform:translateY(-3px);
+  filter:brightness(1.06);
 }
 .chaos-close:active{
-  transform:translate(2px,2px);
-  box-shadow:2px 2px 0 var(--ui-dark), 3px 3px 0 #1a1a18;
+  transform:translateY(1px);
+  filter:brightness(.97);
 }
 
-/* ============================================================
-   CHAOS 卡片右下角小狗（em 单位版）
-   ============================================================ */
+/* ★ 修复：小狗右侧间距 ×2 */
 .chaos-dog{
   position:absolute;
-  right:36px;
+  right:72px;
   bottom:20px;
   pointer-events:none;
   opacity:.94;
   z-index:1;
 }
 .chaos-dog .main{
-  /* ★ 改这一个值即可整体缩放小狗 */
   font-size:8.4px;
   position:relative;
   width:23.5em;
@@ -1127,8 +1157,63 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
 }
 .toast-tip.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ============================================================
+   GSAP 动画系统：托管状态
+   ------------------------------------------------------------
+   理念：JS（GSAP）拥有动画属性的写权，CSS 只负责初始隐藏态。
+   一旦 GSAP 接管，用 html.gsap-ready 取消相关 transition，
+   避免 CSS 过渡与 GSAP 互相打断。
+   ============================================================ */
+html.gsap-ready .header-logo,
+html.gsap-ready .header-text,
+html.gsap-ready .tool-fab,
+html.gsap-ready .intro-folder-scale,
+html.gsap-ready .chaos-box,
+html.gsap-ready #folderOverlay,
+html.gsap-ready #googleOverlay,
+html.gsap-ready #skyBg,
+html.gsap-ready body::before{
+  transition:none !important;
+}
+html.gsap-ready:not(.stage-entered) .pixar-card{
+  opacity:0;
+  transform:translateY(140px);
+  transition:none !important;
+}
+html.gsap-ready .header-logo,
+html.gsap-ready .header-text,
+html.gsap-ready .tool-fab{
+  opacity:0;
+}
+html.gsap-ready .header-logo{animation:none !important;}
+html.gsap-ready body.stage-main .header-logo{animation:none !important;opacity:1;}
+html.gsap-ready body.stage-main .header-text{transform:none;}
+html.gsap-ready .header-text{transform:none;}
+
+.stage-depth-wrap{
+  will-change:transform, filter;
+  transform-origin:50% 42%;
+}
+body.chaos-open .container,
+body.chaos-open .tool-fab,
+body.chaos-open .vinyl-player,
+body.chaos-open #skyBg{
+  pointer-events:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .header-logo,.header-text,.pixar-card,.tool-fab{opacity:1 !important;transform:none !important;}
+  .google-pulse,.folder,.letter-head-gif,.music-dot,
+  .pulse,.eq-bar,.loader-grid-anim>span,.loader-bars-anim .bar,
+  .loader-spinner-anim,.card-folder,.flap,.vinyl-big,.chaos-dog .dog *,.intro-letter.show .rule-item{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+  }
+}
+
 @media (max-width:768px){
-  html,body{overflow:auto}
+  /* ★ 修复：移动端纵向可滚动，横向禁止（防止滑动返回冲突） */
+  html,body{overflow-x:hidden; overflow-y:auto}
   .container{
     height:auto;min-height:100vh;
     padding:40px 12px 120px;
@@ -1139,7 +1224,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .header-logo{width:76px;height:76px;}
   .header-cheers{font-size:2.7rem;letter-spacing:.12em;}
   .header-club{font-size:2.5rem;}
-  .header-line2{font-size:16px;letter-spacing:.28em;}
+  .header-line2{font-size:17px;letter-spacing:.28em;}
   .cards-panel{gap:44px;flex-wrap:wrap;}
   .pixar-card{max-width:100%;padding:1.1em;}
   .card-avatar{width:80px;height:80px;margin-left:8px;}
@@ -1149,12 +1234,12 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
   .card-count{padding:0.4em 0.85em;min-width:65px;}
   .draw-button{font-size:1em;padding:0.75em 0.7em;}
   .chaos-box{border-width:0.18em;}
-  .chaos-but{font-size:2.4rem}
-  .chaos-word{font-size:1.3rem;letter-spacing:.36em;padding-left:.36em}
+  .chaos-word{font-size:2.4rem; letter-spacing:.14em}
   .chaos-name{font-size:1.9rem}
   .chaos-desc{font-size:1rem}
   .chaos-actions{padding-left:0;text-align:center}
-  .chaos-dog{right:24px;bottom:14px;}
+  /* ★ 修复：移动端小狗右距 24→48 */
+  .chaos-dog{right:48px;bottom:14px;}
   .chaos-dog .main{font-size:4px;}
   .tool-fab{left:16px;bottom:16px;width:50px;height:50px;}
   .tool-main{width:50px;height:50px;}
@@ -1212,7 +1297,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       <input type="checkbox" class="folder-toggle" id="folderToggle">
       <div class="folder-stage">
         <div class="folder-back"></div>
-
         <div class="cards">
           <div class="card-folder card-1">
             <svg width="164" height="214" viewBox="0 0 164 214" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1272,7 +1356,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
             </svg>
           </div>
         </div>
-
         <div class="flap">
           <div class="flap-blur"></div>
           <svg width="321" height="241" viewBox="0 0 321 241" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1284,7 +1367,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
         </div>
       </div>
     </label>
-
     <div class="folder-hint" id="folderHint">
       <div class="hint-row">
         <span class="pulse"></span>
@@ -1304,25 +1386,16 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       <div class="letter-sub">Game Rules</div>
     </div>
   </div>
-
   <div class="rule-list">
-    <div class="rule-item">
-      <div class="rule-text">主持人播放音乐，大家开始传玩偶。</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-text">音乐停止时，<strong>拿着玩偶的同学</strong>需要接受挑战。</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-text">口头选择<strong>「真心话」</strong>或<strong>「大冒险」</strong>后，主持人代为点击。</div>
-    </div>
-    <div class="rule-item">
-      <div class="rule-text">每次抽取都有 <strong>20% 概率触发 CHAOS 随机牌</strong>，敬请期待！[doge]</div>
-    </div>
+    <div class="rule-item"><div class="rule-text">主持人播放音乐，大家开始传玩偶。</div></div>
+    <div class="rule-item"><div class="rule-text">音乐停止时，<strong>拿着玩偶的同学</strong>需要接受挑战。每位同学第一次接受挑战前还先需要向大家做自我介绍哦！</div></div>
+    <div class="rule-item"><div class="rule-text">口头选择<strong>「真心话」</strong>或<strong>「大冒险」</strong>后，主持人代为点击。</div></div>
+    <div class="rule-item"><div class="rule-text">每次抽取都有 <strong>20% 概率触发 CHAOS 随机牌</strong>，敬请期待！[doge]</div></div>
   </div>
 </div>
 
-<!-- ★ 天空背景 iframe（Three.js 场景） -->
-<iframe id="skyBg" src="./cartier-sky-background.html" title="Sky Background" aria-hidden="true"></iframe>
+<!-- 天空背景 iframe -->
+<iframe id="skyBg" src="./cartier-sky-background2.html" title="Sky Background" aria-hidden="true"></iframe>
 
 <!-- 主内容 -->
 <div class="container">
@@ -1333,8 +1406,7 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
         <span class="header-cheers">CHEERS</span>
         <span class="header-club">奇思科创社</span>
       </div>
-      <div class="header-divider-line"></div>
-      <div class="header-line2">全社大会游戏环节</div>
+      <div class="header-line2">全社大会真心话大冒险游戏环节</div>
     </div>
   </header>
 
@@ -1415,7 +1487,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
         <path d="M9.6 4C5.4 6.1 3 9.6 3 14.2c0 3.2 2.1 5.8 5.1 5.8 2.6 0 4.5-2 4.5-4.5 0-2.4-1.8-4.3-4.2-4.3-.4 0-.9.1-1 .1.3-2.4 2.4-5.1 4.6-6.3L9.6 4zm10.4 0c-4.2 2.1-6.6 5.6-6.6 10.2 0 3.2 2.1 5.8 5.1 5.8 2.6 0 4.5-2 4.5-4.5 0-2.4-1.8-4.3-4.2-4.3-.4 0-.9.1-1 .1.3-2.4 2.4-5.1 4.6-6.3L20 4z"/>
       </svg>
       <div class="chaos-title-row">
-        <span class="chaos-but">But</span>
         <span class="chaos-word">CHAOS</span>
       </div>
     </div>
@@ -1433,7 +1504,6 @@ body.stage-main .tool-fab{opacity:1;transform:translateY(0);}
       </button>
     </div>
 
-    <!-- ★ 右下角小狗 -->
     <div class="chaos-dog" aria-hidden="true">
       <div class="main">
         <div class="dog">
@@ -1636,6 +1706,47 @@ function toggleFullscreen(){
   else exitFullscreen();
 }
 
+/* ============================================================
+   动画引擎初始化
+   ============================================================ */
+const hasGSAP = typeof window.gsap !== 'undefined';
+const hasFlip = hasGSAP && typeof window.Flip !== 'undefined';
+const hasST   = hasGSAP && typeof window.ScrollTrigger !== 'undefined';
+if (hasGSAP){
+  document.documentElement.classList.add('gsap-ready');
+  if (hasFlip) gsap.registerPlugin(Flip);
+  if (hasST)   gsap.registerPlugin(ScrollTrigger);
+}
+
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const T = (v) => prefersReduced ? Math.min(v, 0.001) : v;
+const D = (v) => prefersReduced ? 0 : v;
+
+/* 缓动语汇：不同元素用不同曲线，制造重量与弹性（不"一起飞入"） */
+const EASE = {
+  settle : 'power3.out',        // 落位：先快后缓，有重量感
+  glide  : 'power2.out',        // 平移：顺滑
+  soft   : 'power1.inOut',      // 轻缓
+  rise   : 'back.out(1.5)',     // 轻微回弹
+  snap   : 'back.out(2.2)',     // 明显弹跳（按钮/弹窗）
+  exit   : 'power2.in',         // 退场：加速离开
+  drift  : 'sine.inOut'         // 循环微动
+};
+
+/* ==================== 天空 iframe 加载状态检测 ==================== */
+const skyIframe = document.getElementById('skyBg');
+let skyReady = false;
+skyIframe.addEventListener('load', () => {
+  skyReady = true;
+  document.body.classList.add('sky-ready');
+});
+/* 4 秒超时兜底：若 iframe 还没就绪，让 body::before 背景保持可见 */
+setTimeout(() => {
+  if (!skyReady){
+    document.body.classList.add('sky-failed');
+  }
+}, 4000);
+
 /* ==================== 开场流程 ==================== */
 const googleOverlay = document.getElementById('googleOverlay');
 const folderOverlay = document.getElementById('folderOverlay');
@@ -1646,14 +1757,105 @@ const introLetter = document.getElementById('introLetter');
 
 let stage = 0;
 
+/* 微动循环（关键帧）的 tween 引用，用于清理 */
+let ambientTweens = [];
+
+/* 主舞台入场 */
+let stageIntroTL = null;
+function playStageIntro(){
+  const logo   = document.querySelector('.header-logo');
+  const text   = document.querySelector('.header-text');
+  const cheers = document.querySelector('.header-cheers');
+  const club   = document.querySelector('.header-club');
+  const sub    = document.querySelector('.header-line2');
+  const cards  = gsap.utils.toArray('.pixar-card');
+  const fab    = document.querySelector('.tool-fab');
+  const sky    = document.getElementById('skyBg');
+
+  if (!hasGSAP){
+    document.body.classList.add('stage-main');
+    return;
+  }
+  if (stageIntroTL) stageIntroTL.kill();
+  document.documentElement.classList.remove('stage-entered');
+  const tl = gsap.timeline({ defaults:{ ease: EASE.settle } });
+  stageIntroTL = tl;
+
+  tl.to(sky, { opacity:1, duration:T(1.1), ease:EASE.soft }, 0);
+  document.body.classList.add('stage-main');
+
+  tl.fromTo(logo,
+      { opacity:0, x:-160, scale:.82, rotate:-8 },
+      { opacity:1, x:0, scale:1, rotate:0, duration:T(1.0), ease:EASE.rise }, 0.05);
+  tl.fromTo(text,
+      { opacity:0, x:80 },
+      { opacity:1, x:0, duration:T(0.85), ease:EASE.glide }, 0.22);
+
+  tl.fromTo([cheers, club],
+      { opacity:0, y:26, filter:'blur(6px)' },
+      { opacity:1, y:0, filter:'blur(0px)', duration:T(0.7), ease:EASE.rise, stagger:T(0.1) }, 0.34);
+  tl.fromTo(sub,
+      { opacity:0, x:-18 },
+      { opacity:1, x:0, duration:T(0.6), ease:EASE.glide }, 0.72);
+
+  /* ★ 修复：卡片入场后清内联样式并把 hover 交还 CSS */
+  tl.fromTo(cards,
+      { opacity:0, y:120, rotate:(i)=> (i? 2.2 : -2.2), scale:.94 },
+      {
+        opacity:1, y:0, rotate:0, scale:1, duration:T(0.95), ease:EASE.rise, stagger:T(0.14),
+        onComplete(){
+          document.documentElement.classList.add('stage-entered');
+          cards.forEach(c => {
+            c.style.transform = '';
+            c.style.opacity = '';
+            c.style.filter = '';
+            c.style.transition = '';
+          });
+        }
+      }, 0.82);
+
+  if (fab) tl.fromTo(fab,
+      { opacity:0, y:60, scale:.7 },
+      { opacity:1, y:0, scale:1, duration:T(0.7), ease:EASE.snap }, '-=0.35');
+
+  return tl;
+}
+
+/* 主舞台退场 */
+function playStageOut(){
+  if (!hasGSAP){ document.body.classList.remove('stage-main'); return null; }
+  stopAmbientLoops();
+  document.documentElement.classList.remove('stage-entered');
+  const logo = document.querySelector('.header-logo');
+  const text = document.querySelector('.header-text');
+  const cards = gsap.utils.toArray('.pixar-card');
+  const fab = document.querySelector('.tool-fab');
+  const tl = gsap.timeline({
+    defaults:{ ease: EASE.exit },
+    onStart(){ document.body.classList.remove('stage-main'); }
+  });
+  if (stageIntroTL) stageIntroTL.kill();
+  tl.to(fab, { opacity:0, y:50, scale:.7, duration:T(0.3) }, 0)
+    .to(cards, { opacity:0, y:70, rotate:1.5, duration:T(0.4), stagger:T(0.06) }, 0)
+    .to(text, { opacity:0, x:60, duration:T(0.35) }, 0.06)
+    .to(logo, { opacity:0, x:-140, scale:.85, duration:T(0.4) }, 0.06);
+  return tl;
+}
+
 googleOverlay.addEventListener('click', () => {
   if (stage !== 0) return;
   stage = 1;
   enterFullscreen();
-  googleOverlay.classList.add('hidden');
-  setTimeout(() => {
+  if (hasGSAP){
+    gsap.to(googleOverlay, { opacity:0, duration:T(0.7), ease:EASE.soft,
+      onComplete(){ googleOverlay.classList.add('hidden'); } });
+    gsap.set(folderOverlay, { opacity:0 });
     folderOverlay.classList.add('show');
-  }, 550);
+    gsap.to(folderOverlay, { opacity:1, duration:T(0.8), delay:D(0.45), ease:EASE.soft });
+  } else {
+    googleOverlay.classList.add('hidden');
+    setTimeout(() => folderOverlay.classList.add('show'), 550);
+  }
 });
 
 introFolder.addEventListener('click', (e) => {
@@ -1661,9 +1863,7 @@ introFolder.addEventListener('click', (e) => {
   stage = 2;
   folderToggle.checked = true;
   folderHint.classList.add('hide');
-  setTimeout(() => {
-    introLetter.classList.add('show');
-  }, 550);
+  setTimeout(() => introLetter.classList.add('show'), prefersReduced ? 0 : 480);
 });
 
 let wheelAccumulator = 0;
@@ -1674,20 +1874,22 @@ function startMainStage(){
 
   introLetter.classList.remove('show');
   introLetter.classList.add('exit');
-
-  setTimeout(() => {
-    folderOverlay.classList.add('hidden');
-  }, 350);
-
-  /* ★ stage-main 加的瞬间：标题入场动画 + 天空背景开始淡入 */
-  setTimeout(() => {
-    document.body.classList.add('stage-main');
-  }, 550);
-
-  setTimeout(() => {
-    folderOverlay.style.display = 'none';
-    introLetter.style.display = 'none';
-  }, 2000);
+  if (hasGSAP){
+    gsap.to(folderOverlay, { opacity:0, duration:T(0.5), delay:D(0.2), ease:EASE.exit,
+      onComplete(){ folderOverlay.classList.add('hidden'); } });
+    gsap.delayedCall(D(0.5), () => { playStageIntro(); afterStageIntro(); });
+    gsap.delayedCall(T(1.6), () => {
+      folderOverlay.style.display = 'none';
+      introLetter.style.display = 'none';
+    });
+  } else {
+    setTimeout(() => folderOverlay.classList.add('hidden'), 350);
+    setTimeout(() => document.body.classList.add('stage-main'), 550);
+    setTimeout(() => {
+      folderOverlay.style.display = 'none';
+      introLetter.style.display = 'none';
+    }, 2000);
+  }
 }
 
 function goBackToRules(){
@@ -1695,18 +1897,33 @@ function goBackToRules(){
   stage = 2;
   wheelAccumulator = 0;
 
-  document.body.classList.remove('stage-main');
+  if (hasGSAP){
+    const out = playStageOut();
+    const t0 = out ? T(0.25) : 0;
+    gsap.delayedCall(t0, () => {
+      folderOverlay.style.display = '';
+      folderOverlay.classList.remove('hidden');
+      gsap.set(folderOverlay, { opacity:0 });
+      folderToggle.checked = true;
+      folderHint.classList.add('hide');
+      gsap.to(folderOverlay, { opacity:1, duration:T(0.6), ease:EASE.soft });
 
-  setTimeout(() => {
-    folderOverlay.style.display = '';
-    folderOverlay.classList.remove('hidden');
-    folderToggle.checked = true;
-    folderHint.classList.add('hide');
-
-    introLetter.style.display = '';
-    introLetter.classList.remove('exit');
-    introLetter.classList.add('show');
-  }, 150);
+      introLetter.style.display = '';
+      introLetter.classList.remove('exit');
+      introLetter.classList.add('show');
+    });
+  } else {
+    document.body.classList.remove('stage-main');
+    setTimeout(() => {
+      folderOverlay.style.display = '';
+      folderOverlay.classList.remove('hidden');
+      folderToggle.checked = true;
+      folderHint.classList.add('hide');
+      introLetter.style.display = '';
+      introLetter.classList.remove('exit');
+      introLetter.classList.add('show');
+    }, 150);
+  }
 }
 
 document.addEventListener('wheel', (e) => {
@@ -1740,7 +1957,9 @@ document.addEventListener('touchmove', (e) => {
     }
   } else if (stage === 3){
     const dy = e.touches[0].clientY - touchStartY;
-    if (dy > 60){
+    /* ★ 修复：移动端主舞台内下滑滚动时，只有滚动到顶部才响应"返回规则页" */
+    const atTop = (window.scrollY || document.documentElement.scrollTop || 0) <= 5;
+    if (dy > 60 && atTop){
       touchStartY = e.touches[0].clientY;
       goBackToRules();
     }
@@ -1748,22 +1967,21 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: true });
 
 /* ==================== 题库 ==================== */
-/* 真心话：轻松趣味 + 搞怪自曝 + 社团/科技梗，全场合安全（不涉隐私深水区） */
 const truthList = [
-  "你最近一次熬夜到凌晨是在干什么？",
+  "你最近一次熬夜到凌晨是在干什么？是否愿意和大家分享一下是为什么？",
   "你最近一次撒的谎是什么？小谎也算。",
   "你给老师或同学发消息，有没有手滑发错过人？后来怎么样了？",
   "你的第一个网名是什么？为什么会想到这个名字？",
-  "第一次来社团报到时，你心里其实在想什么？",
+  "第一次来社团报到时，你心里在想什么？",
   "你做过最幼稚但坚持到今天的事是什么？",
-  "你最害怕的东西是什么？蟑螂、高数都算。",
+  "你最害怕的东西是什么？怕虫子、怕当众发言都算。",
   "说出一件你买回来只用过一次的东西。",
   "你觉得自己三年后在过什么样的生活？说具体点。",
   "如果明天就是世界末日，你今晚最想干的三件事是什么？",
   "你觉得自己最像哪种动物？为什么？",
   "如果给社团全社大会新增一个环节，你想加什么？",
   "你收到过最离谱的礼物是什么？",
-  "你做过最想从记忆里删掉的一件糗事是什么？当时有几个人在场？",
+  "你做过最想从别人的记忆里删掉的一件糗事是什么？当时有几个人在场？",
   "来到一中这么久，你有留意过自己从起床到抵达教室花费的最短时间吗？是因为什么特殊原因，有没有省掉什么步骤？",
   "你写过的最套路的请假理由是什么？老师看到后是什么反应？最后请假成功了吗？",
   "你是否有一个坚持了很久的小迷信？比如考前不洗头。",
@@ -1772,9 +1990,9 @@ const truthList = [
   "你逃过课吗？逃课去干嘛了？",
   "你买东西最冲动的一次，花了多少钱买了什么？",
   "如果给你一天当社长，你最想在社团推行什么奇怪点子？",
-  "学期初咱们社团的周边售卖，你有来吗？如果让你来决定卖哪些新周边，你会选择什么？定价多少？",
+  "学期初咱们社团的周边售卖，你有来吗？如果让你来决定卖哪些新周边，你有什么新点子？定价多少？",
   "你做过最『社死』的事情是什么？后来怎么圆的？",
-  "你最不能忍受同伴的哪个习惯？建议不要点名哦",
+  "你最不能忍受同伴的哪个习惯？建议不要点名哦 [doge]",
   "你小时候有什么梦想吗？现在还在追求吗？如果不是了，是什么让你放弃的？",
   "如果社团突然获得一笔巨款，你第一个建议买什么？",
   "你最想和谁交换人生一天？在座的也可以。",
@@ -1782,14 +2000,13 @@ const truthList = [
   "你最想拥有哪种超能力？要说出具体用途。",
   "你宿舍或家里最神奇的一件收藏品是什么？",
   "是否愿意分享你给别人起过的最肉麻的备注？能分享原因吗？",
-  "你愿意分享手机里最舍不得删的聊天框吗？为什么？",
+  "你愿意分享手机里最舍不得删的某个聊天框吗？为什么？",
   "如果期末可以开卷考一科，你选哪科？为什么偏偏是它？",
-  "用一句真心话评价今天的活动，夸奖或吐槽都行。"
+  "用一句真心话大胆地评价今天的活动，什么吐槽都行。"
 ];
 
-/* 大冒险：现场即可完成，表演/模仿/互动为主，无肢体接触、无离场任务 */
 const dareList = [
-  "模仿家里人平时叫你起床时的样子和话语。",
+  "模仿家里人或者室友平时叫你起床时的样子和话语。",
   "说出一句你家乡最常出现的口头禅，然后自己翻译一遍。",
   "试着模仿广播站播音，凭着记忆中的点歌台话术和表达，给现场任意一位同学点歌；记不清的话，可以求助。",
   "模仿你们班里某位老师的口头禅，并可以和大家简单分享一下这位老师。",
@@ -1806,9 +2023,12 @@ const dareList = [
   "模仿你刷到一段视频笑到前仰后合的样子，坚持五秒。",
   "模仿头发被静电炸起来、你伸手去压、又炸起来的循环，做三轮。",
   "模仿踩进水坑、鞋进水之后你走路的姿势，绕舞台走一圈。",
-  "叫另外一位同学与你一起上台，面对面憋笑，谁先破功则需要再抽一条惩罚",
+  "叫另外一位同学与你一起上台，面对面憋笑，谁先破绷则需要再抽一条惩罚",
   "公开跟一位同部门比你小一届或大一届的同学说一句你想说的话——对工作的期待、对明年的愿望都行",
   "对着天花板做出你认为最夸张的动作，并保持五秒。",
+  "模仿体育节目解说员的语气，站在台上激情解说传玩偶和挑战环节两轮，可以和朋友一起来。",
+  "用“译制腔”说一段话：“噢，我亲爱的朋友，看在上帝的份上，我们为什么不开始下一个有趣的环节呢？”",
+  "到台上还原一个经典影视桥段（比如《泰坦尼克号》船头展臂），可以找人合作。"
 ];
 
 const chaosCards = [
@@ -1840,7 +2060,6 @@ function nextLoaderHTML(){
 /* ==================== 状态 ==================== */
 let truthPool = [...truthList];
 let darePool  = [...dareList];
-let forceChaos = false;
 let chaosActive = false;
 
 /* ==================== DOM ==================== */
@@ -1949,15 +2168,20 @@ function updateTruth(){
   truthBtn.disabled = true;
   playBurningAnimation('truth', () => {
     const item = drawFromPool(truthPool);
-    truthContent.innerHTML = '<div class="card-question"></div>';
-    const qEl = truthContent.querySelector('.card-question');
-    typeWriter(qEl, item, 25, () => {
-      setTimeout(() => {
-        const willChaos = forceChaos || Math.random() < 0.2;
-        forceChaos = false;
-        if (willChaos) showChaos();
-      }, 450);
-    });
+    flipCards(() => { truthContent.innerHTML = '<div class="card-question"></div>'; });
+
+    /* ★ 修复：等 Flip 布局补间基本结束，再启动打字机，避免两者打架 */
+    const typingDelay = (hasFlip && !prefersReduced) ? 550 : 0;
+    setTimeout(() => {
+      const qEl = truthContent.querySelector('.card-question');
+      if (!qEl) return;
+      typeWriter(qEl, item, 25, () => {
+        setTimeout(() => {
+          if (Math.random() < 0.2) showChaos();
+        }, 450);
+      });
+    }, typingDelay);
+
     truthId.textContent = truthPool.length;
     bumpCount(truthId);
     truthBtn.disabled = false;
@@ -1970,15 +2194,19 @@ function updateDare(){
   dareBtn.disabled = true;
   playBurningAnimation('dare', () => {
     const item = drawFromPool(darePool);
-    dareContent.innerHTML = '<div class="card-question"></div>';
-    const qEl = dareContent.querySelector('.card-question');
-    typeWriter(qEl, item, 25, () => {
-      setTimeout(() => {
-        const willChaos = forceChaos || Math.random() < 0.2;
-        forceChaos = false;
-        if (willChaos) showChaos();
-      }, 450);
-    });
+    flipCards(() => { dareContent.innerHTML = '<div class="card-question"></div>'; });
+
+    const typingDelay = (hasFlip && !prefersReduced) ? 550 : 0;
+    setTimeout(() => {
+      const qEl = dareContent.querySelector('.card-question');
+      if (!qEl) return;
+      typeWriter(qEl, item, 25, () => {
+        setTimeout(() => {
+          if (Math.random() < 0.2) showChaos();
+        }, 450);
+      });
+    }, typingDelay);
+
     dareId.textContent = darePool.length;
     bumpCount(dareId);
     dareBtn.disabled = false;
@@ -1989,6 +2217,15 @@ function updateDare(){
 truthBtn.addEventListener('click', updateTruth);
 dareBtn.addEventListener('click', updateDare);
 
+/* ============================================================
+   CHAOS 弹窗
+   ------------------------------------------------------------
+   ★ 修复：入场动画由 CSS 的 chaosPop 负责，GSAP 只负责其他元素
+     与背景景深，避免两套动画同时写 box 的 transform 引起抖动。
+   ============================================================ */
+const stageLayer = document.querySelector('.container');
+let chaosBackdropTL = null;
+
 function showChaos(){
   if (chaosActive) return;
   chaosActive = true;
@@ -1996,10 +2233,56 @@ function showChaos(){
   chaosName.textContent = card.name;
   chaosDesc.textContent = card.desc;
   chaosOverlay.classList.add('active');
+  document.body.classList.add('chaos-open');
+
+  if (!hasGSAP){ return; }
+  if (chaosBackdropTL) chaosBackdropTL.kill();
+
+  /* 清掉上一轮 closeChaos 留下的内联样式，交给 CSS chaosPop 重新入场 */
+  const box = chaosOverlay.querySelector('.chaos-box');
+  box.style.opacity = '';
+  box.style.transform = '';
+  /* OK 按钮：清掉入场补间可能残留的内联 transform，确保 :hover 上浮生效 */
+  chaosOverlay.querySelector('.chaos-close').style.transform = '';
+
+  const quote = chaosOverlay.querySelector('.chaos-quote');
+  const divider = chaosOverlay.querySelector('.chaos-divider');
+  const nameEl = chaosOverlay.querySelector('.chaos-name');
+  const descEl = chaosOverlay.querySelector('.chaos-desc');
+  const closeBtn = chaosOverlay.querySelector('.chaos-close');
+  const dog = chaosOverlay.querySelector('.chaos-dog');
+
+  chaosBackdropTL = gsap.timeline();
+  chaosBackdropTL
+    /* 背景景深：慢速轻幅度，只做纵深不抢戏；模糊半径调小降低合成压力 */
+    .to(stageLayer, { scale:0.94, filter:'blur(3px) brightness(.88)', duration:T(0.75), ease:EASE.soft }, 0)
+    .to('#skyBg', { scale:1.06, filter:'brightness(.85)', duration:T(0.95), ease:EASE.soft }, 0)
+    /* 遮罩淡入：GSAP 独占 opacity，带缓出，不再硬切 */
+    .fromTo(chaosOverlay, { opacity:0 }, { opacity:1, duration:T(0.55), ease:'power1.out' }, 0)
+    /* 注意：box 的 transform/opacity 交给 CSS chaosPop（.85s），GSAP 不写，避免打架 */
+    .fromTo(quote, { opacity:0, scale:.5, rotate:-12 }, { opacity:.92, scale:1, rotate:0, duration:T(0.7), ease:EASE.rise }, 0.28)
+    .fromTo(divider, { scaleX:0, transformOrigin:'left center' }, { scaleX:1, duration:T(0.7), ease:EASE.glide }, 0.36)
+    .fromTo(nameEl, { opacity:0, y:16, scale:.9 }, { opacity:1, y:0, scale:1, duration:T(0.7), ease:EASE.rise }, 0.42)
+    .fromTo(descEl, { opacity:0, y:14 }, { opacity:1, y:0, duration:T(0.7), ease:EASE.glide }, 0.56)
+    .fromTo(closeBtn, { opacity:0, y:12, scale:.8 }, { opacity:1, y:0, scale:1, duration:T(0.6), ease:EASE.snap, clearProps:'transform' }, 0.7)
+    .fromTo(dog, { opacity:0, y:20, scale:.85 }, { opacity:.94, y:0, scale:1, duration:T(0.8), ease:EASE.rise }, 0.64);
 }
+
 function closeChaos(){
-  chaosOverlay.classList.remove('active');
   chaosActive = false;
+  document.body.classList.remove('chaos-open');
+  if (!hasGSAP){
+    chaosOverlay.classList.remove('active');
+    return;
+  }
+  if (chaosBackdropTL) chaosBackdropTL.kill();
+  const box = chaosOverlay.querySelector('.chaos-box');
+  const tl = gsap.timeline();
+  tl.to(box, { opacity:0, scale:.88, y:12, duration:T(0.28), ease:EASE.exit })
+    .to(chaosOverlay, { opacity:0, duration:T(0.24), ease:'none',
+      onComplete(){ chaosOverlay.classList.remove('active'); } }, 0.06)
+    .to(stageLayer, { scale:1, filter:'blur(0px) brightness(1)', duration:T(0.5), ease:EASE.soft }, 0.05)
+    .to('#skyBg', { scale:1, filter:'brightness(1)', duration:T(0.55), ease:EASE.soft }, 0.05);
 }
 chaosCloseBtn.addEventListener('click', closeChaos);
 
@@ -2036,9 +2319,10 @@ toolRefresh.addEventListener('click', () => {
   updateButtonStates();
   truthId.textContent = truthPool.length;
   dareId.textContent  = darePool.length;
-  truthContent.innerHTML = '<div class="card-placeholder"><span class="card-placeholder-emoji">💭</span>点击下方按钮<br>解锁一个灵魂拷问</div>';
-  dareContent.innerHTML  = '<div class="card-placeholder"><span class="card-placeholder-emoji">🎯</span>点击下方按钮<br>接受命运的安排</div>';
-  forceChaos = false;
+  flipCards(() => {
+    truthContent.innerHTML = '<div class="card-placeholder"><span class="card-placeholder-emoji">💭</span>点击下方按钮<br>解锁一个灵魂拷问</div>';
+    dareContent.innerHTML  = '<div class="card-placeholder"><span class="card-placeholder-emoji">🎯</span>点击下方按钮<br>接受命运的安排</div>';
+  });
   showToast('题库已重置');
 });
 
@@ -2090,6 +2374,78 @@ let currentIndex = 0;
 let isPlaying = false;
 let isDraggingProgress = false;
 
+/* ★ 修复：IndexedDB 持久化音乐文件（刷新后可恢复） */
+const musicDB = {
+  open(){
+    return new Promise((res, rej) => {
+      if (!('indexedDB' in window)){ rej(new Error('IndexedDB 不可用')); return; }
+      const req = indexedDB.open('cheers-music-db', 1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('tracks')){
+          db.createObjectStore('tracks', { keyPath: 'id', autoIncrement: true });
+        }
+      };
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+  },
+  async add(track){
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('tracks', 'readwrite');
+      tx.objectStore('tracks').add(track);
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  },
+  async all(){
+    const db = await this.open();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('tracks', 'readonly');
+      const req = tx.objectStore('tracks').getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => rej(req.error);
+    });
+  }
+};
+
+async function saveTrackToDB(file, parsed){
+  try {
+    await musicDB.add({
+      title: parsed.title,
+      artist: parsed.artist,
+      name: file.name,
+      type: file.type,
+      blob: file
+    });
+  } catch(e){
+    console.warn('保存音乐到 IndexedDB 失败：', e);
+  }
+}
+
+async function initMusicFromDB(){
+  try {
+    const tracks = await musicDB.all();
+    for (const t of tracks){
+      if (t.blob){
+        playlist.push({
+          title: t.title,
+          artist: t.artist,
+          url: URL.createObjectURL(t.blob)
+        });
+      }
+    }
+    if (playlist.length > 0){
+      loadTrack(0);
+      updateTrackInfo();
+      showToast('已恢复 ' + playlist.length + ' 首音乐', 2600);
+    }
+  } catch(e){
+    console.warn('恢复音乐失败：', e);
+  }
+}
+
 vinylClose.addEventListener('click', (e) => {
   e.stopPropagation();
   vinylPlayer.classList.remove('show');
@@ -2129,7 +2485,6 @@ audio.addEventListener('loadedmetadata', () => {
 });
 
 /* ========== 文件名 → 歌手/歌名 映射表 ========== */
-/* 笑吐了，不懂算法太麻烦，只好用这个笨方法了，辛苦本地AI了*/
 const TRACK_MAP = {
   "Always Online - 林俊杰": { artist: "林俊杰", title: "Always Online" },
   "Apologize - OneRepublic": { artist: "OneRepublic", title: "Apologize" },
@@ -2300,10 +2655,10 @@ nextBtn.addEventListener('click', () => {
   if (isPlaying) play();
 });
 
-fileInput.addEventListener('change', (e) => {
+fileInput.addEventListener('change', async (e) => {
   const files = Array.from(e.target.files);
   let added = 0;
-  files.forEach(f => {
+  for (const f of files){
     if (f.type.startsWith('audio/')){
       const parsed = resolveTrack(f.name);
       playlist.push({
@@ -2311,9 +2666,10 @@ fileInput.addEventListener('change', (e) => {
         artist: parsed.artist,
         url: URL.createObjectURL(f)
       });
+      await saveTrackToDB(f, parsed);
       added++;
     }
-  });
+  }
   if (added > 0){
     if (playlist.length === added) loadTrack(0);
     updateTrackInfo();
@@ -2356,6 +2712,63 @@ updateTrackInfo();
 truthId.textContent = truthPool.length;
 dareId.textContent  = darePool.length;
 vinylPlayer.classList.add('paused');
+setupStageScroll();
+initMusicFromDB();
+
+/* ============================================================
+   微动循环（★ 修复：去掉卡片微呼吸，保留 Logo 与分隔线，
+   避免与卡片 hover 冲突；并可在退场时统一清理）
+   ============================================================ */
+function startAmbientLoops(){
+  if (!hasGSAP || prefersReduced) return;
+  stopAmbientLoops();
+
+  const logo = document.querySelector('.header-logo');
+  if (logo){
+    ambientTweens.push(gsap.to(logo, {
+      y:'-=8', duration:1.7, ease:EASE.drift, yoyo:true, repeat:-1, delay:0.2
+    }));
+  }
+}
+function stopAmbientLoops(){
+  ambientTweens.forEach(t => t.kill());
+  ambientTweens = [];
+}
+function afterStageIntro(){ if (hasGSAP) gsap.delayedCall(T(1.8), startAmbientLoops); }
+
+/* ============================================================
+   滚动参与
+   ============================================================ */
+let stageScrub = null;
+function setupStageScroll(){
+  if (!hasGSAP || !hasST) return;
+  stageScrub = ScrollTrigger.create({
+    trigger: document.documentElement,
+    start: 'top top',
+    end: () => '+=' + Math.max(400, window.innerHeight * 0.6),
+    onEnter(){ if (stage === 2) startMainStage(); },
+    onLeaveBack(){ if (stage === 3) goBackToRules(); }
+  });
+}
+
+/* ============================================================
+   Flip 布局连续性
+   ============================================================ */
+function flipCards(mutate){
+  if (!hasGSAP || !hasFlip){ mutate(); return; }
+  const targets = gsap.utils.toArray('.pixar-card, .card-image-area, .card-count');
+  const state = Flip.getState(targets);
+  mutate();
+  Flip.from(state, {
+    duration: prefersReduced ? 0 : 0.6,
+    ease: 'power2.out',
+    absolute: false,
+    scale: true,
+    nested: true,
+    prune: true
+  });
+}
+
 </script>
 </body>
 </html>
