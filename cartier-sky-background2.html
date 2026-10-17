@@ -225,6 +225,12 @@ const LAYERS = [
   ]},
 ];
 
+// 层内初始铺位序号（必须先写回布局对象：下面建云时是浅拷贝，
+// 后补 slot 的话副本里拿到的是 undefined，初始 x 会变成 NaN，云整批消失）
+for (const layer of LAYERS) {
+  layer.clouds.forEach((c, i) => { c.slot = i; c.count = layer.clouds.length; });
+}
+
 const clouds = [];
 for (const layer of LAYERS) {
   for (const c of layer.clouds) {
@@ -243,10 +249,6 @@ for (const layer of LAYERS) {
                   period: 9 + Math.random() * 4,
                   phase: Math.random() * Math.PI * 2, ...c });
   }
-}
-// 层内初始铺位序号
-for (const layer of LAYERS) {
-  layer.clouds.forEach((c, i) => { c.slot = i; c.count = layer.clouds.length; });
 }
 
 // 每朵云露出面板上缘的高度（占自身半高），参差但不排成整齐横排
