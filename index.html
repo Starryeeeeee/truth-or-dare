@@ -551,6 +551,8 @@ body.stage-main .pixar-card:hover{
   font-size:2.4em;display:block;margin-bottom:0.4em;
   font-style:normal;line-height:1;
 }
+/* SVG 图标占位（Twemoji）：随字号缩放，居中 */
+.card-placeholder-emoji svg{width:1em;height:1em;vertical-align:middle;}
 .card-burning{
   display:none;flex-direction:column;align-items:center;
   justify-content:center;gap:10px;padding:14px 0;flex:1;
@@ -1427,7 +1429,7 @@ body.chaos-open #skyBg{
       <div class="card-image-area">
         <div class="card-content" id="truthContent">
           <div class="card-placeholder">
-            <span class="card-placeholder-emoji">💭</span>
+            <span class="card-placeholder-emoji"><svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#BDDDF4" d="M35 12c0-3.866-3.134-7-7-7-1.167 0-2.265.29-3.232.794-2.082-2.827-5.425-4.669-9.205-4.669-5.132 0-9.475 3.38-10.923 8.036C1.982 9.778 0 12.155 0 15c0 2.979 2.174 5.445 5.021 5.913C5.237 24.862 8.498 28 12.5 28c2.176 0 4.13-.933 5.5-2.413C19.37 27.067 21.323 28 23.5 28c4.143 0 7.5-3.357 7.5-7.5 0-.71-.105-1.394-.289-2.045C33.23 17.396 35 14.905 35 12z"/><circle fill="#BDDDF4" cx="4" cy="31" r="3"/></svg></span>
             点击下方按钮<br>解锁一个灵魂拷问
           </div>
         </div>
@@ -1460,7 +1462,7 @@ body.chaos-open #skyBg{
       <div class="card-image-area">
         <div class="card-content" id="dareContent">
           <div class="card-placeholder">
-            <span class="card-placeholder-emoji">🎯</span>
+            <span class="card-placeholder-emoji"><svg viewBox="0 0 36 36" aria-hidden="true"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg></span>
             点击下方按钮<br>接受命运的安排
           </div>
         </div>
@@ -1863,6 +1865,9 @@ googleOverlay.addEventListener('click', () => {
   if (stage !== 0) return;
   stage = 1;
   enterFullscreen();
+  /* ★ 进入游戏即自动开播预置背景音乐：此点击是用户手势，
+     浏览器自动播放策略放行；歌单为空时静默跳过 */
+  if (typeof playlist !== 'undefined' && playlist.length > 0 && !isPlaying) play();
   if (hasGSAP){
     gsap.to(googleOverlay, { opacity:0, duration:T(0.7), ease:EASE.soft,
       onComplete(){ googleOverlay.classList.add('hidden'); } });
@@ -2329,6 +2334,10 @@ document.addEventListener('click', (e) => {
   }
 });
 
+/* 占位图标（Twemoji 内联 SVG）：HTML 静态位与 JS 重置位共用同一图形 */
+const EMOJI_TRUTH_SVG = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#BDDDF4" d="M35 12c0-3.866-3.134-7-7-7-1.167 0-2.265.29-3.232.794-2.082-2.827-5.425-4.669-9.205-4.669-5.132 0-9.475 3.38-10.923 8.036C1.982 9.778 0 12.155 0 15c0 2.979 2.174 5.445 5.021 5.913C5.237 24.862 8.498 28 12.5 28c2.176 0 4.13-.933 5.5-2.413C19.37 27.067 21.323 28 23.5 28c4.143 0 7.5-3.357 7.5-7.5 0-.71-.105-1.394-.289-2.045C33.23 17.396 35 14.905 35 12z"/><circle fill="#BDDDF4" cx="4" cy="31" r="3"/></svg>';
+const EMOJI_DARE_SVG  = '<svg viewBox="0 0 36 36" aria-hidden="true"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg>';
+
 toolRefresh.addEventListener('click', () => {
   toolFab.classList.remove('open');
   volumePopover.classList.remove('show');
@@ -2338,8 +2347,8 @@ toolRefresh.addEventListener('click', () => {
   truthId.textContent = truthPool.length;
   dareId.textContent  = darePool.length;
   flipCards(() => {
-    truthContent.innerHTML = '<div class="card-placeholder"><span class="card-placeholder-emoji">💭</span>点击下方按钮<br>解锁一个灵魂拷问</div>';
-    dareContent.innerHTML  = '<div class="card-placeholder"><span class="card-placeholder-emoji">🎯</span>点击下方按钮<br>接受命运的安排</div>';
+    truthContent.innerHTML = '<div class="card-placeholder"><span class="card-placeholder-emoji">' + EMOJI_TRUTH_SVG + '</span>点击下方按钮<br>解锁一个灵魂拷问</div>';
+    dareContent.innerHTML  = '<div class="card-placeholder"><span class="card-placeholder-emoji">' + EMOJI_DARE_SVG + '</span>点击下方按钮<br>接受命运的安排</div>';
   });
   showToast('题库已重置');
 });
@@ -2714,6 +2723,17 @@ nextBtn.addEventListener('click', () => {
   if (playlist.length === 0) return;
   loadTrack(currentIndex + 1);
   if (isPlaying) play();
+});
+
+/* ★ 播放中某曲目加载失败（文件缺失/损坏）时自动跳下一首；
+   连续失败不超过歌单长度，防止整张坏歌单陷入死循环 */
+let musicErrStreak = 0;
+audio.addEventListener('playing', () => { musicErrStreak = 0; });
+audio.addEventListener('error', () => {
+  if (playlist.length > 1 && isPlaying && musicErrStreak < playlist.length){
+    musicErrStreak++;
+    nextBtn.click();
+  }
 });
 
 /* ★ 修复：打开系统文件选择器时浏览器会强制退出全屏（安全策略，无法阻止），
