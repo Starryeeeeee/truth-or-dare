@@ -1738,10 +1738,20 @@ const EASE = {
 /* ==================== 天空 iframe 加载状态检测 ==================== */
 const skyIframe = document.getElementById('skyBg');
 let skyReady = false;
+let specksNotified = false;
 skyIframe.addEventListener('load', () => {
   skyReady = true;
   document.body.classList.add('sky-ready');
+  /* 通知早于加载完成的情况：load 后补发一次 */
+  if (specksNotified) notifySpecks();
 });
+/* 浮尘点亮：入场时背景只有光晕，卡片进场完成后才通知背景淡入浮尘层 */
+function notifySpecks(){
+  specksNotified = true;
+  if (skyReady){
+    try { skyIframe.contentWindow.postMessage('specks-on', '*'); } catch(e){}
+  }
+}
 /* 4 秒超时兜底：若 iframe 还没就绪，让 body::before 背景保持可见 */
 setTimeout(() => {
   if (!skyReady){
@@ -1776,6 +1786,7 @@ function playStageIntro(){
 
   if (!hasGSAP){
     document.body.classList.add('stage-main');
+    setTimeout(notifySpecks, 1200);   /* 无 GSAP 降级：卡片 CSS 显示后补通知 */
     return;
   }
   if (stageIntroTL) stageIntroTL.kill();
@@ -1807,6 +1818,7 @@ function playStageIntro(){
         opacity:1, y:0, rotate:0, scale:1, duration:T(0.95), ease:EASE.rise, stagger:T(0.14),
         onComplete(){
           document.documentElement.classList.add('stage-entered');
+          notifySpecks();   /* 卡片到位后，背景浮尘才淡入 */
           cards.forEach(c => {
             c.style.transform = '';
             c.style.opacity = '';
@@ -1887,6 +1899,7 @@ function startMainStage(){
   } else {
     setTimeout(() => folderOverlay.classList.add('hidden'), 350);
     setTimeout(() => document.body.classList.add('stage-main'), 550);
+    setTimeout(notifySpecks, 1700);   /* 无 GSAP 降级：卡片 CSS 显示后补通知 */
     setTimeout(() => {
       folderOverlay.style.display = 'none';
       introLetter.style.display = 'none';

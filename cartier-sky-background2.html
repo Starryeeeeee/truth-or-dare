@@ -40,7 +40,15 @@
      像"光线里的浮尘"，不是粒子特效——无发光、无锐边。
      色板为莫兰迪同带色：雾蓝三阶 / 雾青 / 灰绿 / 软橙 / 暖金 / 灰玫，
      饱和度抬到浅纸底上能读出色彩的程度，但同明度带、整体协调。 */
-  .specks { position: fixed; inset: 0; pointer-events: none; }
+  /* 浮尘由主页控制：默认整层隐藏（页面入场时只有光晕背景），
+     卡片进场完成后主页 postMessage('specks-on') 通知，整层 1.6s 淡入。
+     负延迟让浮尘一出现就散布在各自相位，不是从底部整齐起跑。 */
+  .specks {
+    position: fixed; inset: 0; pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.6s ease;
+  }
+  body.specks-on .specks { opacity: 1; }
   .speck {
     position: absolute;
     left: var(--x); bottom: -6vh;
@@ -60,7 +68,8 @@
     100% { transform: translate(calc(var(--sw) * -0.6), -112vh); opacity: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .speck { animation: none; opacity: var(--o); }
+    .speck { animation: none; opacity: 0; }
+    body.specks-on .speck { opacity: var(--o); }
   }
 </style>
 </head>
@@ -91,5 +100,11 @@
   <i class="speck" style="--x:63%; --s:21px; --c:#E89E68; --o:.32; --t:47s; --d:-33s; --sw:-38px; --b:6px"></i>
   <i class="speck" style="--x:87%; --s:26px; --c:#E4B75C; --o:.28; --t:50s; --d:-16s; --sw:42px;  --b:6px"></i>
 </div>
+<script>
+  /* 主页在卡片进场完成后发来 'specks-on'，浮尘整层淡入 */
+  addEventListener('message', (e) => {
+    if (e.data === 'specks-on') document.body.classList.add('specks-on');
+  });
+</script>
 </body>
 </html>
