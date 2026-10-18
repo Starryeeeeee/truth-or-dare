@@ -2177,7 +2177,7 @@ function updateTruth(){
     setTimeout(() => {
       const qEl = truthContent.querySelector('.card-question');
       if (!qEl) return;
-      typeWriter(qEl, item, 25, () => {
+      typeWriter(qEl, item, 45, () => {
         setTimeout(() => {
           if (Math.random() < 0.2) showChaos();
         }, 450);
@@ -2202,7 +2202,7 @@ function updateDare(){
     setTimeout(() => {
       const qEl = dareContent.querySelector('.card-question');
       if (!qEl) return;
-      typeWriter(qEl, item, 25, () => {
+      typeWriter(qEl, item, 45, () => {
         setTimeout(() => {
           if (Math.random() < 0.2) showChaos();
         }, 450);
