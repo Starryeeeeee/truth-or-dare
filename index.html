@@ -2426,8 +2426,32 @@ async function saveTrackToDB(file, parsed){
   }
 }
 
+/* ★ 预置曲目：music/ 文件夹相对路径自动加载。
+   不经过文件选择器 → 全屏不会退出；曲名需能对上 TRACK_MAP（去扩展名后）。
+   加歌步骤：把 mp3 放进项目 music/ 文件夹，再把文件名加进下面数组，推送即可 */
+const PRESET_TRACKS = [
+  "周杰伦 - 晴天.mp3",
+  "周深 - 起风了.mp3"
+];
+
+async function initPresetTracks(){
+  for (const name of PRESET_TRACKS){
+    const url = './music/' + encodeURIComponent(name);
+    try {
+      const res = await fetch(url, { method: 'HEAD' });   // 文件不存在就静默跳过
+      if (!res.ok) { console.warn('预置曲目缺失，已跳过：', name); continue; }
+      const parsed = resolveTrack(name);
+      playlist.push({ title: parsed.title, artist: parsed.artist, url });
+    } catch(e){
+      console.warn('预置曲目加载失败，已跳过：', name, e);
+    }
+  }
+}
+
 async function initMusicFromDB(){
+  let restored = 0;
   try {
+    await initPresetTracks();          // 预置曲目在前
     const tracks = await musicDB.all();
     for (const t of tracks){
       if (t.blob){
@@ -2436,15 +2460,16 @@ async function initMusicFromDB(){
           artist: t.artist,
           url: URL.createObjectURL(t.blob)
         });
+        restored++;                    // 上传过的追加在后
       }
-    }
-    if (playlist.length > 0){
-      loadTrack(0);
-      updateTrackInfo();
-      showToast('已恢复 ' + playlist.length + ' 首音乐', 2600);
     }
   } catch(e){
     console.warn('恢复音乐失败：', e);
+  }
+  if (playlist.length > 0){
+    loadTrack(0);
+    updateTrackInfo();
+    if (restored > 0) showToast('已恢复 ' + restored + ' 首上传音乐', 2600);
   }
 }
 
@@ -2657,7 +2682,15 @@ nextBtn.addEventListener('click', () => {
   if (isPlaying) play();
 });
 
+/* ★ 修复：打开系统文件选择器时浏览器会强制退出全屏（安全策略，无法阻止），
+   只能在选择器关闭后自动请求回全屏。change=选了文件，cancel=点了取消 */
+function restoreFullscreenAfterPicker(){
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) enterFullscreen();
+}
+fileInput.addEventListener('cancel', restoreFullscreenAfterPicker);
+
 fileInput.addEventListener('change', async (e) => {
+  restoreFullscreenAfterPicker();
   const files = Array.from(e.target.files);
   let added = 0;
   for (const f of files){
