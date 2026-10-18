@@ -44,10 +44,11 @@ const lerp = (a, b, t) => a + (b - a) * t;
 
 /* ------------------------------------------------- 柔和有机云贴图 */
 
-// 不用任何现成图标路径。整朵云由若干个"软边泡"叠加而成：
-// 每个泡是从实心白核心渐隐到透明的径向渐变，边缘没有硬轮廓，
-// 这是去掉贴纸感的关键。叠完后按云的包围盒压一层
-// 白→冷蓝的垂直明暗，让云有体积但依然是"平面印刷"的体积。
+// 积云造型：平底云身 + 顶部 3~4 个圆丘，整朵云用同一次 2.5px 雾化画完。
+// 踩过的坑：①"软泡自由叠加"像棉絮不像云；②丘雾化 + 云身硬边，
+// 两种边缘硬度交界处出现拼贴缝（一朵云中间横一道线）。
+// 现在：丘与云身同滤镜一次画完，接缝和边缘同样柔和；丘的位置按
+// "必须互相重叠"预设，从结构上杜绝脱节小泡。
 function makeCloudTexture(seed) {
   const S = 512;
   const rnd = mulberry32(seed);
@@ -56,34 +57,58 @@ function makeCloudTexture(seed) {
   canvas.width = canvas.height = S;
   const ctx = canvas.getContext('2d');
 
-  // 云沿水平轴展开，中段的泡最大最高，两端收小——自然云的剪影规律
-  const n = 6 + Math.floor(rnd() * 3);          // 6~8 个泡
-  const span = S * (0.62 + rnd() * 0.10);       // 云的水平跨度
-  const baseY = S * 0.60;                       // 云底基准线
-  let minY = S, maxY = 0, minX = S, maxX = 0;
+  const flip = rnd() < 0.5;
+  const halfW = S * (0.33 + rnd() * 0.05);          // 云身半宽
+  const H = S * (0.12 + rnd() * 0.04);              // 云身高（平底到丘基）
+  const baseY = S * 0.72;                           // 平底位置
+  const cx = S / 2;
+  const slabTop = baseY - H;
 
-  const puff = (px, py, pr) => {
-    const g = ctx.createRadialGradient(px, py, pr * 0.18, px, py, pr);
-    g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(0.72, 'rgba(255,255,255,0.96)');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(px - pr, py - pr, pr * 2, pr * 2);
-    minY = Math.min(minY, py - pr); maxY = Math.max(maxY, py + pr);
-    minX = Math.min(minX, px - pr); maxX = Math.max(maxX, px + pr);
-  };
+  // 顶部圆丘：[水平偏移(倍S), 半径(倍S)]。相邻间距 < 半径和 = 保证重叠
+  const nL = rnd() < 0.55 ? 4 : 3;
+  const layout = nL === 3
+    ? [[-0.22, 0.095], [0.00, 0.145], [0.22, 0.095]]
+    : [[-0.26, 0.085], [-0.09, 0.115], [0.09, 0.115], [0.26, 0.085]];
+  const lobes = layout.map(([dx, rr]) => {
+    const env = 1 - Math.abs(dx) / 0.30;            // 越靠中间越高
+    const r = S * rr * (0.92 + rnd() * 0.16);
+    return {
+      x: cx + dx * S + (rnd() - 0.5) * S * 0.015,
+      y: slabTop - r * (0.40 + env * 0.30),
+      r,
+    };
+  });
 
-  // 底部一条宽而扁的软泡当"云身"，泡群坐在它上面
-  puff(S / 2, baseY, span * 0.30);
-
-  for (let i = 0; i < n; i++) {
-    const t = i / (n - 1);
-    const env = Math.pow(Math.sin(Math.PI * t), 0.8);   // 中间鼓两端收
-    const px = S / 2 + lerp(-span / 2, span / 2, t) + (rnd() - 0.5) * span * 0.05;
-    const py = baseY - env * S * (0.13 + rnd() * 0.06) + (rnd() - 0.5) * S * 0.02;
-    const pr = S * (0.075 + env * 0.085) * (0.92 + rnd() * 0.16);
-    puff(px, py, pr);
+  // 包围盒（供明暗渐变和宽高比起算）
+  let minY = slabTop, maxY = baseY, minX = cx - halfW, maxX = cx + halfW;
+  for (const l of lobes) {
+    minY = Math.min(minY, l.y - l.r); maxY = Math.max(maxY, l.y + l.r);
+    minX = Math.min(minX, l.x - l.r); maxX = Math.max(maxX, l.x + l.r);
   }
+
+  ctx.save();
+  if (flip) { ctx.translate(S, 0); ctx.scale(-1, 1); }
+
+  // 丘 + 云身在同一个 2.5px 雾化里画：边缘、接缝同等柔和
+  ctx.fillStyle = '#ffffff';
+  ctx.filter = 'blur(2.5px)';
+  for (const l of lobes) {
+    ctx.beginPath();
+    ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const r = H * 0.5;
+  ctx.beginPath();
+  ctx.moveTo(cx - halfW, baseY);
+  ctx.lineTo(cx + halfW, baseY);
+  ctx.lineTo(cx + halfW, slabTop + r);
+  ctx.quadraticCurveTo(cx + halfW, slabTop, cx + halfW - r, slabTop);
+  ctx.lineTo(cx - halfW + r, slabTop);
+  ctx.quadraticCurveTo(cx - halfW, slabTop, cx - halfW, slabTop + r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.filter = 'none';
+  ctx.restore();
 
   // 明暗：顶部亮白 → 底部雾紫灰影（莫奈雾系的云影，不是冷蓝）
   const grad = ctx.createLinearGradient(0, minY, 0, maxY);
