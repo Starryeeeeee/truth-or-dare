@@ -10,29 +10,76 @@
   /* 方案 K · 纸境
      页面从 loading、信封到信纸一路都是纸的世界，主舞台不再另起"天空"，
      底色就是信纸色温的延伸——入场时 iframe 淡入与纸奶底色同色，无断裂。
-     构成：三段纸奶渐变 + 两抹极淡径向光（右上暖金 / 左下冷蓝，
-     呼应页面 body::before 但更克制）+ 一层静态纸面颗粒（印刷感）。
+     构成：纸奶渐变底 + 两抹可感知的径向光（右上暖金 / 左下冷蓝，
+     呼应页面 body::before 的金/蓝双色系统）+ 静态纸面颗粒（印刷感）
+     + 少量缓慢上浮的细小色彩点缀（像光线里的浮尘）。
      纯 CSS 实现：不依赖 WebGL / Three.js，零 GPU 开销，瞬间就绪。 */
   body {
     background:
-      radial-gradient(62% 52% at 86% 10%, rgba(243, 222, 178, 0.30), transparent 72%),
-      radial-gradient(56% 46% at 8% 90%, rgba(203, 224, 234, 0.28), transparent 72%),
-      linear-gradient(180deg, #FDF9F0 0%, #FBF7F0 45%, #F3EDE0 100%);
+      radial-gradient(58% 50% at 85% 8%, rgba(240, 202, 122, 0.42), transparent 70%),
+      radial-gradient(52% 44% at 6% 94%, rgba(160, 200, 226, 0.40), transparent 70%),
+      radial-gradient(30% 26% at 92% 55%, rgba(238, 160, 110, 0.14), transparent 72%),
+      linear-gradient(180deg, #FEFCF5 0%, #FBF7F0 45%, #EEE6D4 100%);
   }
 
-  /* 静态纸面颗粒：feTurbulence 噪点，去色后压到 5% 不透明度，
-     像纸浆纤维而不是数字噪点（不随时间变化，避免闪烁） */
+  /* 静态纸面颗粒：feTurbulence 噪点，去色后像纸浆纤维而不是数字噪点
+     （不随时间变化，避免闪烁）。不透明度要压到能"摸到"的程度才有纸感 */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
     filter: saturate(0);
-    opacity: 0.05;
+    opacity: 0.13;
+    mix-blend-mode: multiply;
     pointer-events: none;
+  }
+
+  /* 细小色彩点缀：十几粒柔和的小圆点，从下往上极慢漂移、轻轻左右摆，
+     莫兰迪色取自页面双色系统（雾蓝 / 软橙 / 暖金 / 灰玫）。
+     是"光线里的浮尘"，不是粒子特效——数量少、幅度小、无发光。 */
+  .specks { position: fixed; inset: 0; pointer-events: none; }
+  .speck {
+    position: absolute;
+    left: var(--x); bottom: -6vh;
+    width: var(--s); height: var(--s);
+    border-radius: 50%;
+    background: var(--c);
+    filter: blur(1.5px);
+    opacity: 0;
+    animation: floatUp var(--t) linear infinite;
+    animation-delay: var(--d);
+  }
+  @keyframes floatUp {
+    0%   { transform: translate(0, 0); opacity: 0; }
+    10%  { opacity: var(--o); }
+    50%  { transform: translate(var(--sw), -55vh); }
+    85%  { opacity: var(--o); }
+    100% { transform: translate(calc(var(--sw) * -0.6), -112vh); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .speck { animation: none; opacity: var(--o); }
   }
 </style>
 </head>
 <body>
+<div class="specks" aria-hidden="true">
+  <!-- 雾蓝 -->
+  <i class="speck" style="--x:8%;  --s:10px; --c:#9FC0D8; --o:.38; --t:26s; --d:0s;   --sw:36px"></i>
+  <i class="speck" style="--x:31%; --s:6px;  --c:#AECBDE; --o:.32; --t:34s; --d:-12s; --sw:-28px"></i>
+  <i class="speck" style="--x:64%; --s:8px;  --c:#8FB4D0; --o:.34; --t:30s; --d:-22s; --sw:30px"></i>
+  <i class="speck" style="--x:88%; --s:5px;  --c:#B4CEDE; --o:.30; --t:38s; --d:-6s;  --sw:-34px"></i>
+  <!-- 软橙 -->
+  <i class="speck" style="--x:17%; --s:7px;  --c:#E8AC7E; --o:.34; --t:32s; --d:-9s;  --sw:-30px"></i>
+  <i class="speck" style="--x:47%; --s:9px;  --c:#EFB287; --o:.30; --t:36s; --d:-27s; --sw:26px"></i>
+  <i class="speck" style="--x:79%; --s:6px;  --c:#E8A06A; --o:.32; --t:29s; --d:-16s; --sw:-24px"></i>
+  <!-- 暖金 -->
+  <i class="speck" style="--x:25%; --s:5px;  --c:#E4C07E; --o:.34; --t:33s; --d:-3s;  --sw:32px"></i>
+  <i class="speck" style="--x:56%; --s:7px;  --c:#EBCB90; --o:.30; --t:37s; --d:-19s; --sw:-26px"></i>
+  <i class="speck" style="--x:93%; --s:8px;  --c:#DFB87A; --o:.32; --t:31s; --d:-30s; --sw:28px"></i>
+  <!-- 灰玫 -->
+  <i class="speck" style="--x:12%; --s:6px;  --c:#D9AE9E; --o:.28; --t:35s; --d:-14s; --sw:-32px"></i>
+  <i class="speck" style="--x:70%; --s:5px;  --c:#D4A795; --o:.26; --t:39s; --d:-24s; --sw:30px"></i>
+</div>
 </body>
 </html>
