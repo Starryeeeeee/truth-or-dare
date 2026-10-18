@@ -928,11 +928,14 @@ html:not(.gsap-ready) .chaos-overlay.active{animation:chaosFade .3s ease}
 .loader-bars-anim .bar:nth-child(10){background:#C26832;animation-delay:.1s}
 @keyframes barWave{0%{transform:scale(1)}20%{transform:scale(1,2.32)}40%{transform:scale(1)}}
 .loader-spinner-anim{
-  border:7px solid #E8DCC4;border-top:7px solid #E8B24E;
+  /* 双色环：与九宫格同源——左弧真心话蓝、右弧大冒险橙，
+     顶底保留奶油轨道色；旋转时蓝橙两弧交替追跑 */
+  border:7px solid #E8DCC4;
+  border-left-color:#4A8DB8;border-right-color:#E8834A;
   border-radius:50%;width:60px;height:60px;position:relative;
   animation:spinnerRot 2s linear infinite;
 }
-.loader-spinner-anim::after{content:"";position:absolute;top:-7px;left:-7px;right:-7px;bottom:-7px;border-radius:50%;box-shadow:inset 0 0 16px #E8B24E;}
+.loader-spinner-anim::after{content:"";position:absolute;top:-7px;left:-7px;right:-7px;bottom:-7px;border-radius:50%;box-shadow:inset 14px 0 14px -9px rgba(74,141,184,.55), inset -14px 0 14px -9px rgba(232,131,74,.55);}
 @keyframes spinnerRot{to{transform:rotate(360deg)}}
 
 /* ==================== 左下角工具浮按钮 ==================== */
