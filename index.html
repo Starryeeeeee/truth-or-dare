@@ -2435,23 +2435,30 @@ const PRESET_TRACKS = [
 ];
 
 async function initPresetTracks(){
+  let loaded = 0;
   for (const name of PRESET_TRACKS){
     const url = './music/' + encodeURIComponent(name);
     try {
-      const res = await fetch(url, { method: 'HEAD' });   // 文件不存在就静默跳过
+      const res = await fetch(url, { method: 'HEAD' });
       if (!res.ok) { console.warn('预置曲目缺失，已跳过：', name); continue; }
       const parsed = resolveTrack(name);
       playlist.push({ title: parsed.title, artist: parsed.artist, url });
+      loaded++;
     } catch(e){
-      console.warn('预置曲目加载失败，已跳过：', name, e);
+      /* file:// 等环境下 fetch 被 CORS 拦截，但 <audio> 加载相对路径不受限，
+         此处乐观收录，文件真缺失时播放会静默失败 */
+      const parsed = resolveTrack(name);
+      playlist.push({ title: parsed.title, artist: parsed.artist, url });
+      loaded++;
     }
   }
+  return loaded;
 }
 
 async function initMusicFromDB(){
-  let restored = 0;
+  let restored = 0, presetCount = 0;
   try {
-    await initPresetTracks();          // 预置曲目在前
+    presetCount = await initPresetTracks();   // 预置曲目在前
     const tracks = await musicDB.all();
     for (const t of tracks){
       if (t.blob){
@@ -2469,7 +2476,9 @@ async function initMusicFromDB(){
   if (playlist.length > 0){
     loadTrack(0);
     updateTrackInfo();
-    if (restored > 0) showToast('已恢复 ' + restored + ' 首上传音乐', 2600);
+    if (restored > 0 && presetCount > 0) showToast(`已载入 ${presetCount} 首预置音乐 + 恢复 ${restored} 首上传`, 2600);
+    else if (presetCount > 0) showToast(`已载入 ${presetCount} 首预置音乐`, 2600);
+    else if (restored > 0) showToast('已恢复 ' + restored + ' 首上传音乐', 2600);
   }
 }
 
