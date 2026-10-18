@@ -909,7 +909,7 @@ html:not(.gsap-ready) .chaos-overlay.active{animation:chaosFade .3s ease}
 .loader-grid-anim > span:nth-child(8){animation-delay:.27s}
 .loader-grid-anim > span:nth-child(9){animation-delay:.36s}
 @keyframes sqWave{0%,65%,100%{opacity:.3;transform:scale(.55)}30%{opacity:1;transform:scale(1)}}
-.truth-card .loader-grid-anim{--sq-color:#5BA3C7}
+.truth-card .loader-grid-anim{--sq-color:#4A8DB8}
 .dare-card .loader-grid-anim{--sq-color:#E8834A}
 
 .loader-bars-anim{display:flex;justify-content:center;align-items:center;}
@@ -932,6 +932,29 @@ html:not(.gsap-ready) .chaos-overlay.active{animation:chaosFade .3s ease}
 }
 .loader-spinner-anim::after{content:"";position:absolute;top:-7px;left:-7px;right:-7px;bottom:-7px;border-radius:50%;box-shadow:inset 0 0 16px #E8B24E;}
 @keyframes spinnerRot{to{transform:rotate(360deg)}}
+
+/* ==================== Uiverse 旋转加载器（SchawnnahJ） ==================== */
+/* 双棒 165° 旋转，横竖展收，四色投影。原版是霓虹粉，换成页面的大冒险橙，
+   和奶油底、雾紫天空更协调；透明度 .75→.8，在灰奶油卡片底上更清亮 */
+.loader-orbit-anim{position:relative;width:2.5em;height:2.5em;transform:rotate(165deg);}
+.loader-orbit-anim:before,.loader-orbit-anim:after{
+  content:"";position:absolute;top:50%;left:50%;display:block;
+  width:.5em;height:.5em;border-radius:.25em;transform:translate(-50%,-50%);
+}
+.loader-orbit-anim:before{animation:orbitBefore 2s infinite;}
+.loader-orbit-anim:after{animation:orbitAfter 2s infinite;}
+@keyframes orbitBefore{
+  0%{width:.5em;box-shadow:1em -.5em rgba(232,131,74,.8),-1em .5em rgba(111,202,220,.8)}
+  35%{width:2.5em;box-shadow:0 -.5em rgba(232,131,74,.8),0 .5em rgba(111,202,220,.8)}
+  70%{width:.5em;box-shadow:-1em -.5em rgba(232,131,74,.8),1em .5em rgba(111,202,220,.8)}
+  100%{box-shadow:1em -.5em rgba(232,131,74,.8),-1em .5em rgba(111,202,220,.8)}
+}
+@keyframes orbitAfter{
+  0%{height:.5em;box-shadow:.5em 1em rgba(61,184,143,.8),-.5em -1em rgba(233,169,32,.8)}
+  35%{height:2.5em;box-shadow:.5em 0 rgba(61,184,143,.8),-.5em 0 rgba(233,169,32,.8)}
+  70%{height:.5em;box-shadow:.5em -1em rgba(61,184,143,.8),-.5em 1em rgba(233,169,32,.8)}
+  100%{box-shadow:.5em 1em rgba(61,184,143,.8),-.5em -1em rgba(233,169,32,.8)}
+}
 
 /* ==================== 左下角工具浮按钮 ==================== */
 .tool-fab{
@@ -1205,7 +1228,7 @@ body.chaos-open #skyBg{
   .header-logo,.header-text,.pixar-card,.tool-fab{opacity:1 !important;transform:none !important;}
   .google-pulse,.folder,.letter-head-gif,.music-dot,
   .pulse,.eq-bar,.loader-grid-anim>span,.loader-bars-anim .bar,
-  .loader-spinner-anim,.card-folder,.flap,.vinyl-big,.chaos-dog .dog *,.intro-letter.show .rule-item{
+  .loader-spinner-anim,.loader-orbit-anim,.loader-orbit-anim:before,.loader-orbit-anim:after,.card-folder,.flap,.vinyl-big,.chaos-dog .dog *,.intro-letter.show .rule-item{
     animation-duration:.001ms !important;
     animation-iteration-count:1 !important;
   }
@@ -2048,6 +2071,7 @@ const LOADER_HTML = {
         '<div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>' +
         '</div>',
   spinner: '<div class="loader-spinner-anim"></div>',
+  orbit: '<span class="loader-orbit-anim"></span>',
   boot: '<span class="loader-boot-anim"></span>'
 };
 const LOADER_KEYS = Object.keys(LOADER_HTML);
