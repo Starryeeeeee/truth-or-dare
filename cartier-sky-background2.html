@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>晨光奶蓝天 · 背景 v2</title>
+<title>雾紫晴空 · 背景 v2</title>
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; }
   /* 与 shader 同一套配色，场景就绪前不闪白 */
-  body { background: linear-gradient(180deg, #8AB6D6 0%, #B5D2DF 45%, #DDEBE2 78%, #F7F2E3 100%); }
+  body { background: linear-gradient(180deg, #A9BDD8 0%, #BFCBDF 40%, #E0DCC8 72%, #F4EFDD 100%); }
   canvas { display: block; }
 </style>
 <!-- UMD 版 Three.js：经典 script 标签，file:// 双击打开也能跑，离线可用 -->
@@ -85,12 +85,12 @@ function makeCloudTexture(seed) {
     puff(px, py, pr);
   }
 
-  // 明暗：顶部亮白 → 底部冷蓝影，按云的真实包围盒铺
+  // 明暗：顶部亮白 → 底部雾紫灰影（莫奈雾系的云影，不是冷蓝）
   const grad = ctx.createLinearGradient(0, minY, 0, maxY);
   grad.addColorStop(0.00, '#ffffff');
   grad.addColorStop(0.52, '#fdfefe');
-  grad.addColorStop(0.76, '#e9f1f7');
-  grad.addColorStop(1.00, '#c7d9e8');
+  grad.addColorStop(0.76, '#e8e6ee');
+  grad.addColorStop(1.00, '#c5c3d6');
   ctx.globalCompositeOperation = 'source-atop';
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, S, S);
@@ -157,21 +157,21 @@ const sky = new THREE.Mesh(
       }
 
       void main() {
-        // 方案 C：晨光薄荷。四段色阶，比两段渐变更润
-        vec3 top = vec3(0.541, 0.714, 0.839);   // #8AB6D6
-        vec3 mid = vec3(0.710, 0.824, 0.875);   // #B5D2DF
-        vec3 low = vec3(0.867, 0.922, 0.886);   // #DDEBE2
-        vec3 hor = vec3(0.969, 0.949, 0.890);   // #F7F2E3
+        // 方案 G：莫奈《晨雾塞纳河》雾紫灰蓝 × 梵高《麦田》铬黄暖光
+        vec3 top = vec3(0.663, 0.741, 0.847);   // #A9BDD8 雾蓝
+        vec3 mid = vec3(0.749, 0.796, 0.875);   // #BFCBDF 灰紫雾
+        vec3 low = vec3(0.878, 0.863, 0.784);   // #E0DCC8 转向暖金
+        vec3 hor = vec3(0.957, 0.937, 0.867);   // #F4EFDD 奶油地平线
 
         float t = uTime * 0.004;
         vec3 col = mix(hor, low, smoothstep(0.00, 0.22, vUv.y));
         col = mix(col, mid, smoothstep(0.30, 0.62, vUv.y));
         col = mix(col, top, smoothstep(0.58, 1.00, vUv.y));
 
-        // 左下角一抹暖晨光，很淡，只负责"太阳在画面外左侧"的心理暗示
+        // 左下角一抹铬黄暖阳（梵高麦田的 #EBD48A），很淡
         vec2 gp = vec2(0.16, 0.06);
         float gd = distance(vec2(vUv.x * uAspect, vUv.y), vec2(gp.x * uAspect, gp.y));
-        col = mix(col, vec3(0.965, 0.910, 0.780), exp(-gd * 2.1) * 0.30);
+        col = mix(col, vec3(0.922, 0.831, 0.541), exp(-gd * 2.1) * 0.32);
 
         // 高空一层极淡的流动薄雾，让大片蓝色不死板
         vec2 p = vec2(vUv.x * uAspect, vUv.y) * 2.2;
