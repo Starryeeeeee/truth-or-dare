@@ -326,9 +326,9 @@ body.stage-main #skyBg{opacity:1;}
 .intro-letter.show .rule-item:nth-child(4){animation-delay:.7s;}
 @keyframes ruleFade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-.letter-head{display:flex;align-items:center;gap:24px;margin-bottom:38px;}
+.letter-head{display:flex;align-items:center;gap:28px;margin-bottom:40px;}
 .letter-head-gif{
-  width:129px;height:129px;flex-shrink:0;
+  width:158px;height:158px;flex-shrink:0;
   object-fit:contain;display:block;
   animation:gifFloat 3.2s ease-in-out infinite;
 }
@@ -336,15 +336,15 @@ body.stage-main #skyBg{opacity:1;}
 .letter-head-text{display:flex;flex-direction:column;}
 .letter-title{
   font-family:var(--font-hand);
-  font-size:2.9rem;font-weight:600;
+  font-size:3.5rem;font-weight:600;
   color:var(--ink);letter-spacing:.08em;line-height:1.15;
 }
 .letter-sub{
   font-family:var(--font-serif);
-  font-style:italic;font-size:15px;
+  font-style:italic;font-size:17px;
   color:var(--ink-faint);
   letter-spacing:.28em;text-transform:uppercase;
-  margin-top:8px;
+  margin-top:9px;
 }
 .rule-list{
   display:flex;flex-direction:column;
@@ -374,7 +374,8 @@ body.stage-main #skyBg{opacity:1;}
    四、主内容
    ============================================================ */
 .container{
-  max-width:1140px;margin:0 auto;position:relative;z-index:1;
+  /* ★ 大屏适配：窄屏保底 1140px，大屏随视口放宽（72vw，封顶 1500px） */
+  max-width:clamp(1140px, 72vw, 1500px);margin:0 auto;position:relative;z-index:1;
   height:100vh;
   padding:30px 20px 40px;
   display:flex;flex-direction:column;
@@ -436,7 +437,7 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
 }
 
 .cards-panel{
-  display:flex;gap:72px;justify-content:center;align-items:stretch;
+  display:flex;gap:clamp(72px, 4.5vw, 96px);justify-content:center;align-items:stretch;
   flex-wrap:nowrap;margin-bottom:0;
   flex-shrink:0;
   width:100%;
@@ -451,7 +452,10 @@ body.stage-main .header-text{opacity:1;transform:translateX(0);}
   --button-press-depth:0.18em;
 
   position:relative;
-  width:100%;max-width:460px;
+  width:100%;max-width:30.7em;
+  /* ★ 大屏适配：基准字号随视口流动（15px@1280 → ~17.5px@1920 → 20px 封顶），
+     内部全 em 体系，卡片整体等比放大 */
+  font-size:clamp(15px, 0.4vw + 9.8px, 20px);
   background-color:var(--ui-cream);
   border-radius:1.6em;
   padding:1.25em;
@@ -497,8 +501,8 @@ body.stage-main .pixar-card:hover{
 }
 .card-header{display:flex;align-items:center;margin-bottom:0.9em;}
 .card-avatar{
-  width:92px;height:92px;flex-shrink:0;
-  margin-left:10px;
+  width:6.15em;height:6.15em;flex-shrink:0;
+  margin-left:0.67em;
   transition:transform 0.35s ease;
   display:flex;align-items:center;justify-content:center;
   line-height:0;
@@ -523,7 +527,7 @@ body.stage-main .pixar-card:hover{
   padding:0.85em;border:0.22em solid var(--ui-dark);
   box-shadow:inset 0.2em 0.2em 0 #b3ac9f;
   flex:1;display:flex;flex-direction:column;
-  min-height:200px;position:relative;
+  min-height:13.4em;position:relative;
 }
 .card-content{
   flex:1;display:flex;flex-direction:column;
@@ -555,19 +559,19 @@ body.stage-main .pixar-card:hover{
 .card-placeholder-emoji svg{width:1em;height:1em;vertical-align:middle;}
 .card-burning{
   display:none;flex-direction:column;align-items:center;
-  justify-content:center;gap:10px;padding:14px 0;flex:1;
+  justify-content:center;gap:0.67em;padding:0.93em 0;flex:1;
 }
 .card-burning.active{display:flex}
-.card-burning .burning-loader{display:flex;align-items:center;justify-content:center;min-height:70px;}
+.card-burning .burning-loader{display:flex;align-items:center;justify-content:center;min-height:4.67em;}
 .card-burning .burning-text{
-  font-family:var(--font-hand);font-size:14px;font-weight:500;
+  font-family:var(--font-hand);font-size:0.93em;font-weight:500;
   color:var(--ui-dark);letter-spacing:.16em;opacity:.75;
 }
 .card-burning .burning-dots::after{content:'';animation:dots 1.4s steps(4,end) infinite;}
 @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
 .card-burning .progress-bar{
-  width:150px;height:6px;background:#b3ac9f;
-  border-radius:3px;border:0.15em solid var(--ui-dark);
+  width:10em;height:0.4em;background:#b3ac9f;
+  border-radius:0.2em;border:0.15em solid var(--ui-dark);
   overflow:hidden;position:relative;
 }
 .card-burning .progress-fill{height:100%;width:0%;background:var(--ui-orange);transition:width .1s linear;}
@@ -581,7 +585,7 @@ body.stage-main .pixar-card:hover{
   background:var(--ui-cream);border:0.2em solid var(--ui-dark);
   border-radius:0.9em;padding:0.45em 1em;
   box-shadow:0.18em 0.18em 0 var(--ui-dark);
-  flex-shrink:0;min-width:72px;
+  flex-shrink:0;min-width:4.8em;
 }
 .card-count .num{
   font-family:'Inter',sans-serif;font-size:1.4em;font-weight:900;
@@ -1258,10 +1262,10 @@ body.chaos-open #skyBg{
   .volume-popover{width:190px;padding:14px 16px 12px;}
   .vinyl-player{right:16px;bottom:16px;}
   .intro-letter{width:94vw;padding:40px 32px 36px;border-radius:12px;}
-  .letter-head{gap:18px;margin-bottom:26px;}
-  .letter-head-gif{width:95px;height:95px;}
-  .letter-title{font-size:2rem;}
-  .letter-sub{font-size:13px;}
+  .letter-head{gap:20px;margin-bottom:26px;}
+  .letter-head-gif{width:112px;height:112px;}
+  .letter-title{font-size:2.35rem;}
+  .letter-sub{font-size:14px;}
   .rule-list{gap:20px;}
   .rule-item{gap:16px;}
   .rule-item::before{width:24px;font-size:1.2rem;}
@@ -1429,7 +1433,7 @@ body.chaos-open #skyBg{
       <div class="card-image-area">
         <div class="card-content" id="truthContent">
           <div class="card-placeholder">
-            <span class="card-placeholder-emoji"><svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#BDDDF4" d="M35 12c0-3.866-3.134-7-7-7-1.167 0-2.265.29-3.232.794-2.082-2.827-5.425-4.669-9.205-4.669-5.132 0-9.475 3.38-10.923 8.036C1.982 9.778 0 12.155 0 15c0 2.979 2.174 5.445 5.021 5.913C5.237 24.862 8.498 28 12.5 28c2.176 0 4.13-.933 5.5-2.413C19.37 27.067 21.323 28 23.5 28c4.143 0 7.5-3.357 7.5-7.5 0-.71-.105-1.394-.289-2.045C33.23 17.396 35 14.905 35 12z"/><circle fill="#BDDDF4" cx="4" cy="31" r="3"/></svg></span>
+            <span class="card-placeholder-emoji"><svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#BF6952" d="M28.736 28.767l-21.458.076-1.649 4.835c-.062.187-.101.387-.073.582.145.984.993 1.74 2.017 1.74h20.894c1.024 0 1.872-.756 2.017-1.74.029-.195-.01-.395-.073-.582l-1.675-4.911z"/><path fill="#854836" d="M28.736 28.767l-.19-.556c-.199-.598-.759-1.001-1.389-1.001H8.883c-.63 0-1.19.403-1.389 1.001l-.216.632c2.928 2.344 6.636 3.754 10.678 3.754 4.088 0 7.837-1.438 10.78-3.83z"/><circle fill="#AA8DD8" cx="17.956" cy="15.488" r="15.288"/><circle fill="#744EAA" cx="23.266" cy="12.37" r="4.195"/><circle fill="#744EAA" cx="14.875" cy="18.662" r="3.146"/><circle fill="#744EAA" cx="15.924" cy="5.028" r="2.098"/></svg></span>
             点击下方按钮<br>解锁一个灵魂拷问
           </div>
         </div>
@@ -2335,7 +2339,7 @@ document.addEventListener('click', (e) => {
 });
 
 /* 占位图标（Twemoji 内联 SVG）：HTML 静态位与 JS 重置位共用同一图形 */
-const EMOJI_TRUTH_SVG = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#BDDDF4" d="M35 12c0-3.866-3.134-7-7-7-1.167 0-2.265.29-3.232.794-2.082-2.827-5.425-4.669-9.205-4.669-5.132 0-9.475 3.38-10.923 8.036C1.982 9.778 0 12.155 0 15c0 2.979 2.174 5.445 5.021 5.913C5.237 24.862 8.498 28 12.5 28c2.176 0 4.13-.933 5.5-2.413C19.37 27.067 21.323 28 23.5 28c4.143 0 7.5-3.357 7.5-7.5 0-.71-.105-1.394-.289-2.045C33.23 17.396 35 14.905 35 12z"/><circle fill="#BDDDF4" cx="4" cy="31" r="3"/></svg>';
+const EMOJI_TRUTH_SVG = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#BF6952" d="M28.736 28.767l-21.458.076-1.649 4.835c-.062.187-.101.387-.073.582.145.984.993 1.74 2.017 1.74h20.894c1.024 0 1.872-.756 2.017-1.74.029-.195-.01-.395-.073-.582l-1.675-4.911z"/><path fill="#854836" d="M28.736 28.767l-.19-.556c-.199-.598-.759-1.001-1.389-1.001H8.883c-.63 0-1.19.403-1.389 1.001l-.216.632c2.928 2.344 6.636 3.754 10.678 3.754 4.088 0 7.837-1.438 10.78-3.83z"/><circle fill="#AA8DD8" cx="17.956" cy="15.488" r="15.288"/><circle fill="#744EAA" cx="23.266" cy="12.37" r="4.195"/><circle fill="#744EAA" cx="14.875" cy="18.662" r="3.146"/><circle fill="#744EAA" cx="15.924" cy="5.028" r="2.098"/></svg>';
 const EMOJI_DARE_SVG  = '<svg viewBox="0 0 36 36" aria-hidden="true"><circle fill="#DD2E44" cx="18" cy="18" r="18"/><circle fill="#FFF" cx="18" cy="18" r="13.5"/><circle fill="#DD2E44" cx="18" cy="18" r="10"/><circle fill="#FFF" cx="18" cy="18" r="6"/><circle fill="#DD2E44" cx="18" cy="18" r="3"/><path opacity=".2" d="M18.24 18.282l13.144 11.754s-2.647 3.376-7.89 5.109L17.579 18.42l.661-.138z"/><path fill="#FFAC33" d="M18.294 19c-.255 0-.509-.097-.704-.292-.389-.389-.389-1.018 0-1.407l.563-.563c.389-.389 1.018-.389 1.408 0 .388.389.388 1.018 0 1.407l-.564.563c-.194.195-.448.292-.703.292z"/><path fill="#55ACEE" d="M24.016 6.981c-.403 2.079 0 4.691 0 4.691l7.054-7.388c.291-1.454-.528-3.932-1.718-4.238-1.19-.306-4.079.803-5.336 6.935zm5.003 5.003c-2.079.403-4.691 0-4.691 0l7.388-7.054c1.454-.291 3.932.528 4.238 1.718.306 1.19-.803 4.079-6.935 5.336z"/><path fill="#3A87C2" d="M32.798 4.485L21.176 17.587c-.362.362-1.673.882-2.51.046-.836-.836-.419-2.08-.057-2.443L31.815 3.501s.676-.635 1.159-.152-.176 1.136-.176 1.136z"/></svg>';
 
 toolRefresh.addEventListener('click', () => {
@@ -2801,6 +2805,7 @@ updateTrackInfo();
 truthId.textContent = truthPool.length;
 dareId.textContent  = darePool.length;
 vinylPlayer.classList.add('paused');
+let stageScrub = null;   /* ★ 声明须在 setupStageScroll() 调用前（TDZ） */
 setupStageScroll();
 initMusicFromDB();
 
@@ -2826,9 +2831,8 @@ function stopAmbientLoops(){
 function afterStageIntro(){ if (hasGSAP) gsap.delayedCall(T(1.8), startAmbientLoops); }
 
 /* ============================================================
-   滚动参与
+   滚动参与（stageScrub 声明在上方初始化区，勿在此重复声明）
    ============================================================ */
-let stageScrub = null;
 function setupStageScroll(){
   if (!hasGSAP || !hasST) return;
   stageScrub = ScrollTrigger.create({
