@@ -35,9 +35,11 @@
     pointer-events: none;
   }
 
-  /* 细小色彩点缀：十几粒柔和的小圆点，从下往上极慢漂移、轻轻左右摆，
-     莫兰迪色取自页面双色系统（雾蓝 / 软橙 / 暖金 / 灰玫）。
-     是"光线里的浮尘"，不是粒子特效——数量少、幅度小、无发光。 */
+  /* 细小色彩点缀：二十粒柔和圆点，从下往上极慢漂移、轻轻左右摆。
+     分四档景深（小粒→中粒→主粒→失焦大泡）：越大的越虚、越慢，
+     像"光线里的浮尘"，不是粒子特效——无发光、无锐边。
+     色板为莫兰迪同带色：雾蓝三阶 / 雾青 / 灰绿 / 软橙 / 暖金 / 灰玫，
+     饱和度抬到浅纸底上能读出色彩的程度，但同明度带、整体协调。 */
   .specks { position: fixed; inset: 0; pointer-events: none; }
   .speck {
     position: absolute;
@@ -45,7 +47,7 @@
     width: var(--s); height: var(--s);
     border-radius: 50%;
     background: var(--c);
-    filter: blur(1.5px);
+    filter: blur(var(--b, 1.5px));
     opacity: 0;
     animation: floatUp var(--t) linear infinite;
     animation-delay: var(--d);
@@ -64,22 +66,30 @@
 </head>
 <body>
 <div class="specks" aria-hidden="true">
-  <!-- 雾蓝 -->
-  <i class="speck" style="--x:8%;  --s:10px; --c:#9FC0D8; --o:.42; --t:26s; --d:0s;   --sw:36px"></i>
-  <i class="speck" style="--x:31%; --s:6px;  --c:#AECBDE; --o:.36; --t:34s; --d:-12s; --sw:-28px"></i>
-  <i class="speck" style="--x:64%; --s:8px;  --c:#8FB4D0; --o:.38; --t:30s; --d:-22s; --sw:30px"></i>
-  <i class="speck" style="--x:88%; --s:5px;  --c:#B4CEDE; --o:.35; --t:38s; --d:-6s;  --sw:-34px"></i>
-  <!-- 软橙 -->
-  <i class="speck" style="--x:17%; --s:7px;  --c:#E8AC7E; --o:.38; --t:32s; --d:-9s;  --sw:-30px"></i>
-  <i class="speck" style="--x:47%; --s:9px;  --c:#EFB287; --o:.35; --t:36s; --d:-27s; --sw:26px"></i>
-  <i class="speck" style="--x:79%; --s:6px;  --c:#E8A06A; --o:.36; --t:29s; --d:-16s; --sw:-24px"></i>
-  <!-- 暖金 -->
-  <i class="speck" style="--x:25%; --s:5px;  --c:#E4C07E; --o:.38; --t:33s; --d:-3s;  --sw:32px"></i>
-  <i class="speck" style="--x:56%; --s:7px;  --c:#EBCB90; --o:.35; --t:37s; --d:-19s; --sw:-26px"></i>
-  <i class="speck" style="--x:93%; --s:8px;  --c:#DFB87A; --o:.36; --t:31s; --d:-30s; --sw:28px"></i>
-  <!-- 灰玫 -->
-  <i class="speck" style="--x:12%; --s:6px;  --c:#D9AE9E; --o:.32; --t:35s; --d:-14s; --sw:-32px"></i>
-  <i class="speck" style="--x:70%; --s:5px;  --c:#D4A795; --o:.30; --t:39s; --d:-24s; --sw:30px"></i>
+  <!-- 档一 · 小粒 7-8px -->
+  <i class="speck" style="--x:5%;  --s:8px;  --c:#7FA8CC; --o:.42; --t:36s; --d:-2s;  --sw:28px;  --b:1px"></i>
+  <i class="speck" style="--x:23%; --s:7px;  --c:#DFAE66; --o:.40; --t:40s; --d:-15s; --sw:-24px; --b:1px"></i>
+  <i class="speck" style="--x:41%; --s:8px;  --c:#A9BC8F; --o:.36; --t:34s; --d:-8s;  --sw:26px;  --b:1px"></i>
+  <i class="speck" style="--x:59%; --s:7px;  --c:#D69A85; --o:.38; --t:42s; --d:-21s; --sw:-30px; --b:1px"></i>
+  <i class="speck" style="--x:76%; --s:8px;  --c:#8FB4D0; --o:.40; --t:31s; --d:-11s; --sw:24px;  --b:1px"></i>
+  <i class="speck" style="--x:95%; --s:7px;  --c:#E4B75C; --o:.36; --t:38s; --d:-27s; --sw:-26px; --b:1px"></i>
+  <!-- 档二 · 中粒 10-12px -->
+  <i class="speck" style="--x:12%; --s:11px; --c:#7FA8CC; --o:.48; --t:30s; --d:-4s;  --sw:34px;  --b:1.5px"></i>
+  <i class="speck" style="--x:29%; --s:12px; --c:#E89E68; --o:.46; --t:33s; --d:-17s; --sw:-28px; --b:1.5px"></i>
+  <i class="speck" style="--x:48%; --s:10px; --c:#DFAE66; --o:.44; --t:36s; --d:-23s; --sw:30px;  --b:1.5px"></i>
+  <i class="speck" style="--x:67%; --s:12px; --c:#8FB4D0; --o:.46; --t:29s; --d:-6s;  --sw:-32px; --b:1.5px"></i>
+  <i class="speck" style="--x:84%; --s:11px; --c:#8ABBAD; --o:.42; --t:37s; --d:-29s; --sw:28px;  --b:1.5px"></i>
+  <i class="speck" style="--x:8%;  --s:12px; --c:#D69A85; --o:.44; --t:34s; --d:-13s; --sw:-30px; --b:1.5px"></i>
+  <!-- 档三 · 主粒 14-16px -->
+  <i class="speck" style="--x:18%; --s:15px; --c:#6E9CC4; --o:.52; --t:32s; --d:-9s;  --sw:36px;  --b:2px"></i>
+  <i class="speck" style="--x:37%; --s:14px; --c:#E89468; --o:.50; --t:35s; --d:-25s; --sw:-26px; --b:2px"></i>
+  <i class="speck" style="--x:55%; --s:16px; --c:#DFAE66; --o:.48; --t:30s; --d:-19s; --sw:32px;  --b:2px"></i>
+  <i class="speck" style="--x:72%; --s:14px; --c:#8ABBAD; --o:.52; --t:38s; --d:-3s;  --sw:-34px; --b:2px"></i>
+  <i class="speck" style="--x:90%; --s:15px; --c:#E89E68; --o:.50; --t:33s; --d:-31s; --sw:30px;  --b:2px"></i>
+  <!-- 档四 · 失焦大泡 20-26px：近镜头虚焦，淡而缓 -->
+  <i class="speck" style="--x:26%; --s:24px; --c:#8FB4D0; --o:.30; --t:44s; --d:-7s;  --sw:40px;  --b:6px"></i>
+  <i class="speck" style="--x:63%; --s:21px; --c:#E89E68; --o:.32; --t:47s; --d:-33s; --sw:-38px; --b:6px"></i>
+  <i class="speck" style="--x:87%; --s:26px; --c:#E4B75C; --o:.28; --t:50s; --d:-16s; --sw:42px;  --b:6px"></i>
 </div>
 </body>
 </html>
