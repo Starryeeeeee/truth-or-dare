@@ -16,10 +16,10 @@
      纯 CSS 实现：不依赖 WebGL / Three.js，零 GPU 开销，瞬间就绪。 */
   body {
     background:
-      radial-gradient(58% 50% at 85% 8%, rgba(240, 202, 122, 0.42), transparent 70%),
-      radial-gradient(52% 44% at 6% 94%, rgba(160, 200, 226, 0.40), transparent 70%),
-      radial-gradient(30% 26% at 92% 55%, rgba(238, 160, 110, 0.14), transparent 72%),
-      linear-gradient(180deg, #FEFCF5 0%, #FBF7F0 45%, #EEE6D4 100%);
+      radial-gradient(60% 52% at 85% 8%, rgba(242, 206, 128, 0.50), transparent 70%),
+      radial-gradient(54% 46% at 6% 94%, rgba(164, 203, 228, 0.47), transparent 70%),
+      radial-gradient(30% 26% at 92% 55%, rgba(238, 160, 110, 0.16), transparent 72%),
+      linear-gradient(180deg, #FFFEF9 0%, #FCF8F1 45%, #F0E9D9 100%);
   }
 
   /* 静态纸面颗粒：feTurbulence 噪点，去色后像纸浆纤维而不是数字噪点
@@ -65,21 +65,21 @@
 <body>
 <div class="specks" aria-hidden="true">
   <!-- 雾蓝 -->
-  <i class="speck" style="--x:8%;  --s:10px; --c:#9FC0D8; --o:.38; --t:26s; --d:0s;   --sw:36px"></i>
-  <i class="speck" style="--x:31%; --s:6px;  --c:#AECBDE; --o:.32; --t:34s; --d:-12s; --sw:-28px"></i>
-  <i class="speck" style="--x:64%; --s:8px;  --c:#8FB4D0; --o:.34; --t:30s; --d:-22s; --sw:30px"></i>
-  <i class="speck" style="--x:88%; --s:5px;  --c:#B4CEDE; --o:.30; --t:38s; --d:-6s;  --sw:-34px"></i>
+  <i class="speck" style="--x:8%;  --s:10px; --c:#9FC0D8; --o:.42; --t:26s; --d:0s;   --sw:36px"></i>
+  <i class="speck" style="--x:31%; --s:6px;  --c:#AECBDE; --o:.36; --t:34s; --d:-12s; --sw:-28px"></i>
+  <i class="speck" style="--x:64%; --s:8px;  --c:#8FB4D0; --o:.38; --t:30s; --d:-22s; --sw:30px"></i>
+  <i class="speck" style="--x:88%; --s:5px;  --c:#B4CEDE; --o:.35; --t:38s; --d:-6s;  --sw:-34px"></i>
   <!-- 软橙 -->
-  <i class="speck" style="--x:17%; --s:7px;  --c:#E8AC7E; --o:.34; --t:32s; --d:-9s;  --sw:-30px"></i>
-  <i class="speck" style="--x:47%; --s:9px;  --c:#EFB287; --o:.30; --t:36s; --d:-27s; --sw:26px"></i>
-  <i class="speck" style="--x:79%; --s:6px;  --c:#E8A06A; --o:.32; --t:29s; --d:-16s; --sw:-24px"></i>
+  <i class="speck" style="--x:17%; --s:7px;  --c:#E8AC7E; --o:.38; --t:32s; --d:-9s;  --sw:-30px"></i>
+  <i class="speck" style="--x:47%; --s:9px;  --c:#EFB287; --o:.35; --t:36s; --d:-27s; --sw:26px"></i>
+  <i class="speck" style="--x:79%; --s:6px;  --c:#E8A06A; --o:.36; --t:29s; --d:-16s; --sw:-24px"></i>
   <!-- 暖金 -->
-  <i class="speck" style="--x:25%; --s:5px;  --c:#E4C07E; --o:.34; --t:33s; --d:-3s;  --sw:32px"></i>
-  <i class="speck" style="--x:56%; --s:7px;  --c:#EBCB90; --o:.30; --t:37s; --d:-19s; --sw:-26px"></i>
-  <i class="speck" style="--x:93%; --s:8px;  --c:#DFB87A; --o:.32; --t:31s; --d:-30s; --sw:28px"></i>
+  <i class="speck" style="--x:25%; --s:5px;  --c:#E4C07E; --o:.38; --t:33s; --d:-3s;  --sw:32px"></i>
+  <i class="speck" style="--x:56%; --s:7px;  --c:#EBCB90; --o:.35; --t:37s; --d:-19s; --sw:-26px"></i>
+  <i class="speck" style="--x:93%; --s:8px;  --c:#DFB87A; --o:.36; --t:31s; --d:-30s; --sw:28px"></i>
   <!-- 灰玫 -->
-  <i class="speck" style="--x:12%; --s:6px;  --c:#D9AE9E; --o:.28; --t:35s; --d:-14s; --sw:-32px"></i>
-  <i class="speck" style="--x:70%; --s:5px;  --c:#D4A795; --o:.26; --t:39s; --d:-24s; --sw:30px"></i>
+  <i class="speck" style="--x:12%; --s:6px;  --c:#D9AE9E; --o:.32; --t:35s; --d:-14s; --sw:-32px"></i>
+  <i class="speck" style="--x:70%; --s:5px;  --c:#D4A795; --o:.30; --t:39s; --d:-24s; --sw:30px"></i>
 </div>
 </body>
 </html>
