@@ -44,11 +44,10 @@ const lerp = (a, b, t) => a + (b - a) * t;
 
 /* ------------------------------------------------- 柔和有机云贴图 */
 
-// 积云造型：平底云身 + 顶部 3~4 个圆丘，整朵云用同一次 2.5px 雾化画完。
-// 踩过的坑：①"软泡自由叠加"像棉絮不像云；②丘雾化 + 云身硬边，
-// 两种边缘硬度交界处出现拼贴缝（一朵云中间横一道线）。
-// 现在：丘与云身同滤镜一次画完，接缝和边缘同样柔和；丘的位置按
-// "必须互相重叠"预设，从结构上杜绝脱节小泡。
+// 借鉴 Uiverse「BB-8 开关」（Galahhad）的云技法：一个小核 + 一圈错落偏移泡，
+// 整朵同一个大模糊、同一个半透明白——软到没有明确轮廓，是"一团云的雾"。
+// 与之前的积云剪影是两种语言（那个是"一朵云的形"，这个是"一团云的雾"），
+// 用户点名要试这个，故整体替换贴图生成方式；Three.js 架构不变。
 function makeCloudTexture(seed) {
   const S = 512;
   const rnd = mulberry32(seed);
@@ -58,64 +57,68 @@ function makeCloudTexture(seed) {
   const ctx = canvas.getContext('2d');
 
   const flip = rnd() < 0.5;
-  const halfW = S * (0.33 + rnd() * 0.05);          // 云身半宽
-  const H = S * (0.12 + rnd() * 0.04);              // 云身高（平底到丘基）
-  const baseY = S * 0.72;                           // 平底位置
-  const cx = S / 2;
-  const slabTop = baseY - H;
+  const cx = S * 0.50;
+  const cy = S * 0.54;
 
-  // 顶部圆丘：[水平偏移(倍S), 半径(倍S)]。相邻间距 < 半径和 = 保证重叠
-  const nL = rnd() < 0.55 ? 4 : 3;
-  const layout = nL === 3
-    ? [[-0.22, 0.095], [0.00, 0.145], [0.22, 0.095]]
-    : [[-0.26, 0.085], [-0.09, 0.115], [0.09, 0.115], [0.26, 0.085]];
-  const lobes = layout.map(([dx, rr]) => {
-    const env = 1 - Math.abs(dx) / 0.30;            // 越靠中间越高
-    const r = S * rr * (0.92 + rnd() * 0.16);
-    return {
-      x: cx + dx * S + (rnd() - 0.5) * S * 0.015,
-      y: slabTop - r * (0.40 + env * 0.30),
-      r,
-    };
-  });
+  // 泡组：[水平偏移, 垂直偏移, 宽, 高]（倍 S）。横向链式排列——
+  // 中间高两头低，是一朵云的剪影节奏（散乱簇会像爪子印）。
+  // 注意：BB-8 原版是开关里的小尺寸，搬到全屏背景后整体放大 1.35 倍、
+  // 压扁度从 0.75 放到 0.85——小尺寸上是"精致"，大尺寸上不变大就是"虚"
+  const puffs = [
+    [-0.225,  0.060, 0.160, 0.082],
+    [-0.100, -0.040, 0.200, 0.098],
+    [ 0.060, -0.088, 0.190, 0.092],
+    [ 0.200,  0.000, 0.160, 0.080],
+    [ 0.305,  0.072, 0.115, 0.062],
+  ];
+
+  const drawn = [];
+  for (const [dx, dy, w, h] of puffs) {
+    drawn.push({
+      x: cx + dx * S * (1 + (rnd() - 0.5) * 0.35),
+      y: cy + dy * S * (1 + (rnd() - 0.5) * 0.35),
+      rx: w * S * (0.9 + rnd() * 0.2) / 2,
+      ry: h * S * 0.85 * (0.9 + rnd() * 0.2) / 2,
+    });
+  }
 
   // 包围盒（供明暗渐变和宽高比起算）
-  let minY = slabTop, maxY = baseY, minX = cx - halfW, maxX = cx + halfW;
-  for (const l of lobes) {
-    minY = Math.min(minY, l.y - l.r); maxY = Math.max(maxY, l.y + l.r);
-    minX = Math.min(minX, l.x - l.r); maxX = Math.max(maxX, l.x + l.r);
+  let minY = S, maxY = 0, minX = S, maxX = 0;
+  for (const p of drawn) {
+    minY = Math.min(minY, p.y - p.ry); maxY = Math.max(maxY, p.y + p.ry);
+    minX = Math.min(minX, p.x - p.rx); maxX = Math.max(maxX, p.x + p.rx);
   }
 
   ctx.save();
   if (flip) { ctx.translate(S, 0); ctx.scale(-1, 1); }
 
-  // 丘 + 云身在同一个 2.5px 雾化里画：边缘、接缝同等柔和
-  ctx.fillStyle = '#ffffff';
-  ctx.filter = 'blur(2.5px)';
-  for (const l of lobes) {
+  // 两层结构。踩过的坑：单层半透明 + 大模糊会淡到几乎看不见
+  //（第一版借鉴时就是这样，截图才发现）。现在是：
+  // ① 雾晕：16px 大模糊、0.70 白——向外消散的空气感
+  // ② 云体：同一组泡放大 1.15 倍、8px 中模糊、0.98 白——可读的"云"
+  // 两层同色系叠加，边界同等柔软，不会出现拼贴缝
+  ctx.filter = 'blur(16px)';
+  ctx.fillStyle = 'rgba(255,255,255,0.70)';
+  for (const p of drawn) {
     ctx.beginPath();
-    ctx.arc(l.x, l.y, l.r, 0, Math.PI * 2);
+    ctx.ellipse(p.x, p.y, p.rx, p.ry, 0, 0, Math.PI * 2);
     ctx.fill();
   }
-  const r = H * 0.5;
-  ctx.beginPath();
-  ctx.moveTo(cx - halfW, baseY);
-  ctx.lineTo(cx + halfW, baseY);
-  ctx.lineTo(cx + halfW, slabTop + r);
-  ctx.quadraticCurveTo(cx + halfW, slabTop, cx + halfW - r, slabTop);
-  ctx.lineTo(cx - halfW + r, slabTop);
-  ctx.quadraticCurveTo(cx - halfW, slabTop, cx - halfW, slabTop + r);
-  ctx.closePath();
-  ctx.fill();
+  ctx.filter = 'blur(8px)';
+  ctx.fillStyle = 'rgba(255,255,255,0.98)';
+  for (const p of drawn) {
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y, p.rx * 1.15, p.ry * 1.15, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.filter = 'none';
   ctx.restore();
 
-  // 明暗：顶部亮白 → 底部雾紫灰影（莫奈雾系的云影，不是冷蓝）
+  // 明暗：只压一层极淡的雾紫灰在底部，保持"白雾"主调
   const grad = ctx.createLinearGradient(0, minY, 0, maxY);
   grad.addColorStop(0.00, '#ffffff');
-  grad.addColorStop(0.52, '#fdfefe');
-  grad.addColorStop(0.76, '#e8e6ee');
-  grad.addColorStop(1.00, '#c5c3d6');
+  grad.addColorStop(0.55, '#f6f5f9');
+  grad.addColorStop(1.00, '#dcdae6');
   ctx.globalCompositeOperation = 'source-atop';
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, S, S);
@@ -234,15 +237,15 @@ const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(45) / 2);
 // 形成自然的视差纵深。上部留白给标题区，卡片正后方保持干净。
 const LAYERS = [
   { cross: 104, clouds: [
-    { z: -42, h: 2.9, y:  8.5, tex: 0, op: 0.50 },
-    { z: -40, h: 3.4, y:  5.0, tex: 1, op: 0.58 },
-    { z: -38, h: 2.6, y: 10.5, tex: 2, op: 0.46 },
-    { z: -36, h: 3.1, y:  2.6, tex: 3, op: 0.62 },
+    { z: -42, h: 3.8, y:  8.5, tex: 0, op: 0.62 },
+    { z: -40, h: 4.4, y:  5.0, tex: 1, op: 0.70 },
+    { z: -38, h: 3.4, y: 10.5, tex: 2, op: 0.58 },
+    { z: -36, h: 4.0, y:  2.6, tex: 3, op: 0.72 },
   ]},
   { cross: 82, clouds: [
-    { z: -26, h: 6.4, y:  6.2, tex: 4, op: 0.78 },
-    { z: -24, h: 8.2, y: -2.6, tex: 1, op: 0.86 },
-    { z: -22, h: 5.6, y:  3.0, tex: 2, op: 0.74 },
+    { z: -26, h: 6.4, y:  6.2, tex: 4, op: 0.84 },
+    { z: -24, h: 8.2, y: -2.6, tex: 1, op: 0.90 },
+    { z: -22, h: 5.6, y:  3.0, tex: 2, op: 0.82 },
   ]},
   { cross: 64, clouds: [
     { z: -14, h: 11.0, y: -4.2, tex: 0, op: 0.95, below: true },
